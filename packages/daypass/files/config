@@ -3,6 +3,9 @@ config __PKG_NAME__ 'main'
 	option log_level 'warning'
 	option api_secret ''
 	option dashboard '__DASHBOARD__'
+	# Path to a gzipped mihomo binary to unpack to tmpfs when /usr/bin/mihomo is
+	# absent (small-flash routers). Empty = /usr/lib/__PKG_NAME__/mihomo.gz.
+	option mihomo_gz ''
 
 config settings 'settings'
 	option dns_type 'doh'

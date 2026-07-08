@@ -12,7 +12,10 @@
 # shellcheck source=/dev/null
 . /usr/lib/__PKG_NAME__/list-update.sh
 
-MIHOMO="/usr/bin/mihomo"
+# --- mihomo binary resolution ---
+cmd_mihomo_path() {
+	mihomo_bin || { log "mihomo binary not found (install mihomo or set ${PKG_NAME}.main.mihomo_gz)"; return 1; }
+}
 
 # --- config generation ---
 cmd_generate() {
@@ -28,7 +31,9 @@ cmd_generate() {
 
 cmd_check() {
 	[ -f "$CONFIG_PATH" ] || cmd_generate || return 1
-	"$MIHOMO" -d "$HOME_DIR" -t
+	local mihomo
+	mihomo="$(mihomo_bin)" || { echo "mihomo binary not found" >&2; return 1; }
+	"$mihomo" -d "$HOME_DIR" -t
 }
 
 # --- nftables + policy routing ---
@@ -70,7 +75,8 @@ cmd_lists() {
 
 # --- status / diagnostics ---
 cmd_status() {
-	if pgrep -f "${MIHOMO} -d ${HOME_DIR}" >/dev/null 2>&1; then
+	# match our instance by its -d <home>, independent of the binary path
+	if pgrep -f "mihomo -d ${HOME_DIR}" >/dev/null 2>&1; then
 		echo "running"
 	else
 		echo "stopped"
@@ -89,6 +95,7 @@ cmd_selftest() {
 case "$1" in
 	generate)      cmd_generate ;;
 	check)         cmd_check ;;
+	mihomo_path)   cmd_mihomo_path ;;
 	fw_start)      cmd_fw_start ;;
 	fw_stop)       cmd_fw_stop ;;
 	dns_takeover)  cmd_dns_takeover ;;
@@ -98,7 +105,7 @@ case "$1" in
 	status)        cmd_status ;;
 	selftest)      cmd_selftest ;;
 	*)
-		echo "usage: ${PKG_NAME} {generate|check|fw_start|fw_stop|dns_takeover|dns_restore|list_update|lists|status|selftest}" >&2
+		echo "usage: ${PKG_NAME} {generate|check|mihomo_path|fw_start|fw_stop|dns_takeover|dns_restore|list_update|lists|status|selftest}" >&2
 		exit 1
 		;;
 esac

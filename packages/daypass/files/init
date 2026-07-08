@@ -11,7 +11,6 @@ STOP=10
 . /usr/lib/__PKG_NAME__/env.sh
 
 CLI="/usr/bin/${PKG_NAME}"
-MIHOMO="/usr/bin/mihomo"
 
 extra_command "list_update" "Refresh subnet lists into the nft set"
 
@@ -48,12 +47,14 @@ _cron_del() {
 
 start_service() {
 	_enabled || return 0
-	[ -x "$MIHOMO" ] || { log "mihomo binary missing"; return 1; }
+
+	local mihomo
+	mihomo="$("$CLI" mihomo_path)" || { log "aborting start: mihomo binary not found"; return 1; }
 
 	"$CLI" generate || { log "aborting start: config generation failed"; return 1; }
 
 	procd_open_instance "$PKG_NAME"
-	procd_set_param command /bin/sh -c "exec ${MIHOMO} -d ${HOME_DIR} >> ${LOG_PATH} 2>&1"
+	procd_set_param command /bin/sh -c "exec ${mihomo} -d ${HOME_DIR} >> ${LOG_PATH} 2>&1"
 	procd_set_param file "$CONFIG_PATH"
 	# external-ui lives outside the home dir; allow it (mihomo path-safety guard)
 	procd_set_param env SAFE_PATHS="${UI_DIR}"

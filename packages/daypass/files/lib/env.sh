@@ -50,6 +50,31 @@ DNS_ADDR="127.0.0.42"
 DNS_PORT="53"
 FAKEIP_CIDR="198.18.0.0/16"
 
+# mihomo binary. The 42MB decompressed binary is impractical on small-flash
+# routers, so we support a gzipped binary kept on flash and unpacked to tmpfs on
+# start. Resolution order: an installed /usr/bin/mihomo, then an already-unpacked
+# copy, then unpack a .gz (uci 'mihomo_gz', else our shipped default).
+MIHOMO_GZ_DEFAULT="/usr/lib/${PKG_NAME}/mihomo.gz"
+MIHOMO_EXTRACTED="/tmp/${PKG_NAME}/mihomo"
+
+mihomo_bin() {
+	[ -x /usr/bin/mihomo ] && { echo /usr/bin/mihomo; return 0; }
+	[ -x "$MIHOMO_EXTRACTED" ] && { echo "$MIHOMO_EXTRACTED"; return 0; }
+	local gz
+	gz="$(uci -q get "${PKG_NAME}.main.mihomo_gz")"
+	[ -n "$gz" ] || gz="$MIHOMO_GZ_DEFAULT"
+	if [ -f "$gz" ]; then
+		mkdir -p "$(dirname "$MIHOMO_EXTRACTED")"
+		if gunzip -c "$gz" > "$MIHOMO_EXTRACTED" 2>/dev/null; then
+			chmod 0755 "$MIHOMO_EXTRACTED"
+			echo "$MIHOMO_EXTRACTED"
+			return 0
+		fi
+		rm -f "$MIHOMO_EXTRACTED"
+	fi
+	return 1
+}
+
 log() {
 	logger -t "$PKG_NAME" "$1"
 }
