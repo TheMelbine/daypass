@@ -33,7 +33,9 @@ cmd_check() {
 	[ -f "$CONFIG_PATH" ] || cmd_generate || return 1
 	local mihomo
 	mihomo="$(mihomo_bin)" || { echo "mihomo binary not found" >&2; return 1; }
-	"$mihomo" -d "$HOME_DIR" -t
+	mkdir -p "$UI_DIR"
+	# SAFE_PATHS mirrors the init env so external-ui (outside home) passes -t
+	SAFE_PATHS="$UI_DIR" "$mihomo" -d "$HOME_DIR" -t
 }
 
 # --- nftables + policy routing ---
