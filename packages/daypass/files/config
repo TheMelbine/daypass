@@ -19,13 +19,15 @@ config settings 'settings'
 
 # Example outbound. Paste a vless://, ss://, trojan:// or hysteria2:// string
 # into proxy_string, set enabled '1', and reference this section from a route.
-config proxy 'main'
+# (UCI section names must be unique across the whole file, so this is 'proxy',
+# not 'main'.)
+config proxy 'proxy'
 	option enabled '0'
 	option type 'url'
 	option proxy_string ''
 
 # Example routing bucket: which lists go through which proxy.
-config route 'main'
+config route 'route'
 	option enabled '0'
-	option proxy 'main'
+	option proxy 'proxy'
 	list community_lists 'russia_inside'
