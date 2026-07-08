@@ -1,0 +1,206 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: luci-app\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-07-08 00:00+0000\n"
+"Language-Team: none\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Selective transparent proxy. Paste a proxy link and choose which lists route through it; everything else is routed directly by the kernel."
+msgstr "Выборочный прозрачный прокси. Вставьте ссылку на прокси и выберите, какие списки направлять через него; остальной трафик маршрутизируется ядром напрямую."
+
+msgid "Service"
+msgstr "Служба"
+
+msgid "Enable at boot"
+msgstr "Включать при загрузке"
+
+msgid "Start %s automatically and route selected traffic through the proxy."
+msgstr "Автоматически запускать %s и направлять выбранный трафик через прокси."
+
+msgid "Status"
+msgstr "Состояние"
+
+msgid "Running"
+msgstr "Работает"
+
+msgid "Stopped"
+msgstr "Остановлен"
+
+msgid "Control"
+msgstr "Управление"
+
+msgid "Start"
+msgstr "Запустить"
+
+msgid "Stop"
+msgstr "Остановить"
+
+msgid "Restart"
+msgstr "Перезапустить"
+
+msgid "Proxy"
+msgstr "Прокси"
+
+msgid "One outbound group. Paste a single connection link, list several for auto-selection, or supply raw outbound JSON."
+msgstr "Одна исходящая группа. Вставьте одну ссылку, укажите несколько для авто-выбора или задайте исходящий JSON."
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Single link"
+msgstr "Одна ссылка"
+
+msgid "Selector (manual pick)"
+msgstr "Селектор (ручной выбор)"
+
+msgid "URL test (auto fastest)"
+msgstr "URL-тест (авто-выбор быстрейшего)"
+
+msgid "Raw outbound JSON"
+msgstr "Исходящий JSON"
+
+msgid "Proxy link"
+msgstr "Ссылка на прокси"
+
+msgid "vless:// ss:// trojan:// hysteria2:// (hy2://) or socks:// link."
+msgstr "Ссылка vless:// ss:// trojan:// hysteria2:// (hy2://) или socks://."
+
+msgid "Invalid proxy link"
+msgstr "Некорректная ссылка на прокси"
+
+msgid "Proxy links"
+msgstr "Ссылки на прокси"
+
+msgid "One connection link per entry for selector / url-test groups."
+msgstr "По одной ссылке на строку для групп selector / url-test."
+
+msgid "Outbound JSON"
+msgstr "Исходящий JSON"
+
+msgid "Test URL"
+msgstr "URL для проверки"
+
+msgid "Routing"
+msgstr "Маршрутизация"
+
+msgid "One routing bucket: pick the community lists (and any custom domains/subnets) that should travel through a proxy."
+msgstr "Один набор маршрутизации: выберите списки сообщества (и свои домены/подсети), которые должны идти через прокси."
+
+msgid "Which proxy group this bucket routes through."
+msgstr "Через какую группу прокси идёт этот набор."
+
+msgid "Community lists"
+msgstr "Списки сообщества"
+
+msgid "Domains and subnets in the selected lists are routed through the proxy."
+msgstr "Домены и подсети из выбранных списков направляются через прокси."
+
+msgid "Custom domains"
+msgstr "Свои домены"
+
+msgid "Custom subnets"
+msgstr "Свои подсети"
+
+msgid "%s — Settings"
+msgstr "%s — Настройки"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "Network"
+msgstr "Сеть"
+
+msgid "Lists"
+msgstr "Списки"
+
+msgid "Advanced"
+msgstr "Дополнительно"
+
+msgid "DNS protocol"
+msgstr "Протокол DNS"
+
+msgid "DNS server"
+msgstr "DNS-сервер"
+
+msgid "Bootstrap DNS server"
+msgstr "Начальный DNS-сервер"
+
+msgid "LAN interfaces"
+msgstr "LAN-интерфейсы"
+
+msgid "List update interval"
+msgstr "Интервал обновления списков"
+
+msgid "Every hour"
+msgstr "Каждый час"
+
+msgid "Daily"
+msgstr "Ежедневно"
+
+msgid "Log level"
+msgstr "Уровень журнала"
+
+msgid "API secret"
+msgstr "Секрет API"
+
+msgid "Dashboard"
+msgstr "Панель"
+
+msgid "Disable QUIC"
+msgstr "Отключить QUIC"
+
+msgid "Do not modify DHCP/DNS"
+msgstr "Не изменять DHCP/DNS"
+
+msgid "%s — Diagnostics"
+msgstr "%s — Диагностика"
+
+msgid "Version"
+msgstr "Версия"
+
+msgid "App"
+msgstr "Приложение"
+
+msgid "Core (mihomo)"
+msgstr "Ядро (mihomo)"
+
+msgid "Checks"
+msgstr "Проверки"
+
+msgid "Config"
+msgstr "Конфигурация"
+
+msgid "nftables"
+msgstr "nftables"
+
+msgid "Core log"
+msgstr "Журнал ядра"
+
+msgid "Refresh"
+msgstr "Обновить"
+
+msgid "Running %s…"
+msgstr "Выполняется %s…"
+
+msgid "(no output)"
+msgstr "(нет вывода)"
+
+msgid "Support"
+msgstr "Поддержка"
+
+msgid "Documentation"
+msgstr "Документация"
+
+msgid "Live proxy dashboard."
+msgstr "Живая панель прокси."

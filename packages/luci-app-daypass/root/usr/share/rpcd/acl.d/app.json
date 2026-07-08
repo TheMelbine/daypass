@@ -1,0 +1,19 @@
+{
+	"luci-app-__PKG_NAME__": {
+		"description": "Grant access to __BRAND_NAME__ procedures",
+		"read": {
+			"uci": [ "__PKG_NAME__" ],
+			"ubus": {
+				"luci.__PKG_NAME__": [ "*" ],
+				"rc": [ "list" ],
+				"service": [ "list" ]
+			}
+		},
+		"write": {
+			"uci": [ "__PKG_NAME__" ],
+			"ubus": {
+				"rc": [ "init" ]
+			}
+		}
+	}
+}

@@ -1,0 +1,58 @@
+{%-
+// /usr/share/__PKG_NAME__/ucode/nft.ut — nftables ruleset template.
+// Rendered as: ucode -S nft.ut | nft -f -
+// Topology and marks per docs/CONTRACT.md. The tproxy port comes from the same
+// constants the config generator uses, so the two can never disagree.
+'use strict';
+import * as C from '/usr/share/__PKG_NAME__/ucode/constants.uc';
+import { cursor } from 'uci';
+import { uci_array } from '/usr/share/__PKG_NAME__/ucode/lib.uc';
+
+const uci = cursor();
+uci.load(C.PKG_NAME);
+let ifaces = uci_array(uci.get(C.PKG_NAME, 'settings', 'source_network_interfaces'));
+if (length(ifaces) == 0) ifaces = [ 'br-lan' ];
+let ifset = join(', ', map(ifaces, (x) => '"' + x + '"'));
+const M = C.TPROXY_MARK_HEX;
+-%}
+table inet {{ C.NFT_TABLE }} {
+	set {{ C.NFT_LOCAL_SET }} {
+		type ipv4_addr
+		flags interval
+		auto-merge
+		elements = { {{ join(', ', C.LOCALV4) }} }
+	}
+
+	set {{ C.NFT_SUBNET_SET }} {
+		type ipv4_addr
+		flags interval
+		auto-merge
+	}
+
+	set {{ C.NFT_IFACE_SET }} {
+		type ifname
+		elements = { {{ ifset }} }
+	}
+
+	chain mangle {
+		type filter hook prerouting priority -150; policy accept;
+		ct status dnat return
+		iifname @{{ C.NFT_IFACE_SET }} ip daddr @{{ C.NFT_SUBNET_SET }} meta l4proto { tcp, udp } meta mark set {{ M }} counter
+		iifname @{{ C.NFT_IFACE_SET }} ip daddr {{ C.FAKEIP_NFT }} meta l4proto { tcp, udp } meta mark set {{ M }} counter
+	}
+
+	chain mangle_output {
+		type route hook output priority -150; policy accept;
+		meta mark & {{ C.BYPASS_MARK_HEX }} == {{ C.BYPASS_MARK_HEX }} return
+		ip daddr @{{ C.NFT_LOCAL_SET }} return
+		ct status dnat return
+		ip daddr @{{ C.NFT_SUBNET_SET }} meta l4proto { tcp, udp } meta mark set {{ M }} counter
+		ip daddr {{ C.FAKEIP_NFT }} meta l4proto { tcp, udp } meta mark set {{ M }} counter
+	}
+
+	chain divert {
+		type filter hook prerouting priority -100; policy accept;
+		meta mark & {{ M }} == {{ M }} meta l4proto tcp tproxy ip to {{ C.API_ADDR }}:{{ C.TPROXY_PORT }} counter
+		meta mark & {{ M }} == {{ M }} meta l4proto udp tproxy ip to {{ C.API_ADDR }}:{{ C.TPROXY_PORT }} counter
+	}
+}

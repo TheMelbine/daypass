@@ -1,0 +1,17 @@
+# daypass SDK base image — ipk package format (OpenWrt 24.10).
+#
+# 24.10 needs no ./setup.sh (unlike 25.12). Pin a concrete patch tag. Two
+# interchangeable bases:
+#   openwrt/sdk:x86_64-v24.10.6        official upstream SDK (built here)
+#   itdoginfo/openwrt-sdk-ipk:24.10.6  prebuilt (feeds already updated) — much
+#                                      faster; pass it to build.sh via SDK_IMAGE=
+#
+# This file builds from the official SDK so the base is self-contained.
+FROM openwrt/sdk:x86_64-v24.10.6
+
+WORKDIR /builder
+
+RUN ./scripts/feeds update -a \
+    && ./scripts/feeds install luci-base \
+    && mkdir -p /builder/package/feeds/utilities/ \
+    && mkdir -p /builder/package/feeds/luci/

@@ -1,0 +1,27 @@
+# daypass package build image — apk / OpenWrt 25.12 (local dev; CI uses gh-action-sdk).
+#
+# Built FROM the daypass SDK base (docker/sdk/Dockerfile-sdk-apk). scripts/build.sh
+# builds that base first and passes its tag as SDK_IMAGE. Point SDK_IMAGE at a
+# prebuilt itdoginfo/openwrt-sdk-apk:25.12.3 to skip the slow feeds-update layer.
+ARG SDK_IMAGE=daypass/sdk-apk:25.12
+FROM ${SDK_IMAGE}
+
+# BRAND selects branding/<BRAND>.mk; VERSION is the digit-led package version.
+ARG BRAND=daypass
+ARG VERSION
+ENV DAYPASS_VERSION=${VERSION}
+
+WORKDIR /builder
+
+# The whole repo goes in as ONE feed so packages/<pkg>/ keeps branding/ as a
+# sibling — the package Makefiles locate branding relative to themselves
+# (BRAND_DIR ?= $(PKG_SELF_DIR)/../../branding/). .dockerignore trims the context.
+COPY . /builder/package/feeds/daypass
+
+# mihomo (prebuilt binary) first so the daypass DEPENDS on it resolves, then the
+# two arch-all brand packages. PKG_NAME is brand-driven, so the package names are
+# mihomo / $(BRAND) / luci-app-$(BRAND).
+RUN make defconfig \
+    && make package/mihomo/compile BRAND="${BRAND}" DAYPASS_VERSION="${DAYPASS_VERSION}" -j4 V=s \
+    && make package/daypass/compile BRAND="${BRAND}" DAYPASS_VERSION="${DAYPASS_VERSION}" -j4 V=s \
+    && make package/luci-app-daypass/compile BRAND="${BRAND}" DAYPASS_VERSION="${DAYPASS_VERSION}" -j4 V=s

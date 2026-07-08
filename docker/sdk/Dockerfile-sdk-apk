@@ -1,0 +1,20 @@
+# daypass SDK base image — apk package format (OpenWrt 25.12).
+#
+# 25.12 SDKs ship a ./setup.sh that MUST run before ./scripts/feeds (it wires up
+# the prebuilt toolchain/staging dir); 24.10 does not have it.
+#
+# Pin a concrete patch tag for reproducibility. Two interchangeable bases:
+#   openwrt/sdk:x86_64-v25.12.3        official upstream SDK (built here)
+#   itdoginfo/openwrt-sdk-apk:25.12.3  prebuilt (feeds already updated) — much
+#                                      faster; pass it to build.sh via SDK_IMAGE=
+#
+# This file builds from the official SDK so the base is self-contained.
+FROM openwrt/sdk:x86_64-v25.12.3
+
+WORKDIR /builder
+
+RUN ./setup.sh \
+    && ./scripts/feeds update -a \
+    && ./scripts/feeds install luci-base \
+    && mkdir -p /builder/package/feeds/utilities/ \
+    && mkdir -p /builder/package/feeds/luci/

@@ -1,0 +1,73 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to attach .ipk to a Release on tags
+
+jobs:
+  packages:
+    name: ${{ matrix.arch }} · ${{ matrix.branch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # AX3000 (MediaTek Filogic) target. Add more rows to build other arches;
+          # remember to add that arch's mihomo asset + hash in packages/mihomo/Makefile.
+          - arch: aarch64_cortex-a53
+            branch: openwrt-24.10
+    steps:
+      - uses: actions/checkout@v4
+
+      # Native x86_64 OpenWrt SDK for the target arch — no emulation, cross-compiles
+      # for aarch64. Builds our prebuilt-binary mihomo package + the two arch-all
+      # daypass packages. This is the same action OpenWrt-nikki uses.
+      - name: Build packages (OpenWrt SDK)
+        uses: openwrt/gh-action-sdk@main
+        env:
+          ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
+          FEEDNAME: daypass
+          PACKAGES: mihomo daypass luci-app-daypass
+          NO_REFRESH_CHECK: true
+
+      - name: Collect .ipk
+        run: |
+          mkdir -p dist
+          find bin/packages -name '*.ipk' -exec cp {} dist/ \;
+          echo "Artifacts:"; ls -la dist
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: daypass-${{ matrix.arch }}-${{ matrix.branch }}
+          path: dist/*.ipk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Attach to Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.ipk
+
+  fe-freshness:
+    name: fe-app bundle is fresh
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build the committed bundle and diff it
+        run: |
+          cd fe-app
+          npm ci
+          npm run ci    # lint + test + build (writes the committed main.js)
+          cd ..
+          git diff --exit-code -- packages/luci-app-daypass/htdocs/luci-static/resources/view/app/main.js \
+            || { echo "::error::committed fe-app bundle is stale — run 'make fe' and commit main.js"; exit 1; }

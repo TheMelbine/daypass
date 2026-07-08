@@ -1,0 +1,104 @@
+#!/bin/sh
+# /usr/bin/__PKG_NAME__ — command dispatcher. The procd init and the LuCI rpcd
+# plugin call these subcommands; all logic lives here, never duplicated.
+
+. /lib/functions.sh
+# shellcheck source=/dev/null
+. /usr/lib/__PKG_NAME__/env.sh
+# shellcheck source=/dev/null
+. /usr/lib/__PKG_NAME__/nftset.sh
+# shellcheck source=/dev/null
+. /usr/lib/__PKG_NAME__/dnsmasq.sh
+# shellcheck source=/dev/null
+. /usr/lib/__PKG_NAME__/list-update.sh
+
+MIHOMO="/usr/bin/mihomo"
+
+# --- config generation ---
+cmd_generate() {
+	mkdir -p "$HOME_DIR" "$LOG_DIR" "$PROVIDERS_DIR/rule"
+	if ucode -S "$UCODE_DIR/generate.uc" > "${CONFIG_PATH}.tmp" 2>/dev/null; then
+		mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+	else
+		rm -f "${CONFIG_PATH}.tmp"
+		log "config generation failed"
+		return 1
+	fi
+}
+
+cmd_check() {
+	[ -f "$CONFIG_PATH" ] || cmd_generate || return 1
+	"$MIHOMO" -d "$HOME_DIR" -t
+}
+
+# --- nftables + policy routing ---
+_br_netfilter_off() {
+	if lsmod 2>/dev/null | grep -q br_netfilter &&
+		[ "$(sysctl -n net.bridge.bridge-nf-call-iptables 2>/dev/null)" = "1" ]; then
+		sysctl -w net.bridge.bridge-nf-call-iptables=0 >/dev/null 2>&1
+		sysctl -w net.bridge.bridge-nf-call-ip6tables=0 >/dev/null 2>&1
+	fi
+}
+
+cmd_fw_start() {
+	_br_netfilter_off
+	grep -q "^${RT_TABLE_ID} ${PKG_NAME}$" /etc/iproute2/rt_tables 2>/dev/null ||
+		echo "${RT_TABLE_ID} ${PKG_NAME}" >> /etc/iproute2/rt_tables
+	ip route replace local 0.0.0.0/0 dev lo table "$RT_TABLE_ID"
+	ip -4 rule list | grep -q "fwmark ${TPROXY_MARK}/${TPROXY_MASK} lookup ${RT_TABLE_ID}" ||
+		ip -4 rule add fwmark "${TPROXY_MARK}/${TPROXY_MASK}" table "$RT_TABLE_ID" priority "$RT_RULE_PREF"
+	ucode -T "$UCODE_DIR/nft.ut" | nft -f -
+}
+
+cmd_fw_stop() {
+	nft delete table inet "$NFT_TABLE" 2>/dev/null
+	ip -4 rule del fwmark "${TPROXY_MARK}/${TPROXY_MASK}" table "$RT_TABLE_ID" priority "$RT_RULE_PREF" 2>/dev/null
+	ip route flush table "$RT_TABLE_ID" 2>/dev/null
+}
+
+# --- dnsmasq (from dnsmasq.sh) ---
+cmd_dns_takeover() { dns_takeover; }
+cmd_dns_restore()  { dns_restore; }
+
+# --- lists ---
+cmd_list_update() { list_update; }
+
+cmd_lists() {
+	# Always emits the catalog JSON (LuCI reads it via rpcd).
+	cat "$CATALOG_PATH"
+}
+
+# --- status / diagnostics ---
+cmd_status() {
+	if pgrep -f "${MIHOMO} -d ${HOME_DIR}" >/dev/null 2>&1; then
+		echo "running"
+	else
+		echo "stopped"
+	fi
+}
+
+cmd_selftest() {
+	local ok=0
+	echo "config: $(cmd_check >/dev/null 2>&1 && echo ok || { ok=1; echo FAIL; })"
+	echo "mihomo: $(cmd_status)"
+	echo "nft:    $(nft list table inet "$NFT_TABLE" >/dev/null 2>&1 && echo present || { ok=1; echo MISSING; })"
+	echo "iprule: $(ip -4 rule list | grep -q "lookup ${RT_TABLE_ID}" && echo present || { ok=1; echo MISSING; })"
+	return $ok
+}
+
+case "$1" in
+	generate)      cmd_generate ;;
+	check)         cmd_check ;;
+	fw_start)      cmd_fw_start ;;
+	fw_stop)       cmd_fw_stop ;;
+	dns_takeover)  cmd_dns_takeover ;;
+	dns_restore)   cmd_dns_restore ;;
+	list_update)   cmd_list_update ;;
+	lists)         cmd_lists ;;
+	status)        cmd_status ;;
+	selftest)      cmd_selftest ;;
+	*)
+		echo "usage: ${PKG_NAME} {generate|check|fw_start|fw_stop|dns_takeover|dns_restore|list_update|lists|status|selftest}" >&2
+		exit 1
+		;;
+esac

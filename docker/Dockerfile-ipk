@@ -1,0 +1,25 @@
+# daypass package build image — ipk / OpenWrt 24.10 (local dev; CI uses gh-action-sdk).
+#
+# Built FROM the daypass SDK base (docker/sdk/Dockerfile-sdk-ipk). scripts/build.sh
+# builds that base first and passes its tag as SDK_IMAGE. Point SDK_IMAGE at a
+# prebuilt itdoginfo/openwrt-sdk-ipk:24.10.6 to skip the slow feeds-update layer.
+#
+# NOTE: this SDK builds for the x86_64 TARGET, so mihomo here needs the amd64 asset
+# (packages/mihomo/Makefile maps $(ARCH)). For the AX3000 (aarch64) the CI workflow
+# uses openwrt/gh-action-sdk with ARCH=aarch64_cortex-a53-openwrt-24.10.
+ARG SDK_IMAGE=daypass/sdk-ipk:24.10
+FROM ${SDK_IMAGE}
+
+ARG BRAND=daypass
+ARG VERSION
+ENV DAYPASS_VERSION=${VERSION}
+
+WORKDIR /builder
+
+# Whole repo as one feed (see Dockerfile-apk for why).
+COPY . /builder/package/feeds/daypass
+
+RUN make defconfig \
+    && make package/mihomo/compile BRAND="${BRAND}" DAYPASS_VERSION="${DAYPASS_VERSION}" -j4 V=s \
+    && make package/daypass/compile BRAND="${BRAND}" DAYPASS_VERSION="${DAYPASS_VERSION}" -j4 V=s \
+    && make package/luci-app-daypass/compile BRAND="${BRAND}" DAYPASS_VERSION="${DAYPASS_VERSION}" -j4 V=s

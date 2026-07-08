@@ -1,0 +1,44 @@
+{
+	"admin/services/__PKG_NAME__": {
+		"title": "__BRAND_NAME__",
+		"action": {
+			"type": "firstchild"
+		},
+		"depends": {
+			"acl": [ "luci-app-__PKG_NAME__" ],
+			"uci": { "__PKG_NAME__": true }
+		}
+	},
+	"admin/services/__PKG_NAME__/connection": {
+		"title": "Connection",
+		"order": 10,
+		"action": {
+			"type": "view",
+			"path": "__PKG_NAME__/connection"
+		}
+	},
+	"admin/services/__PKG_NAME__/settings": {
+		"title": "Settings",
+		"order": 20,
+		"action": {
+			"type": "view",
+			"path": "__PKG_NAME__/settings"
+		}
+	},
+	"admin/services/__PKG_NAME__/diagnostics": {
+		"title": "Diagnostics",
+		"order": 30,
+		"action": {
+			"type": "view",
+			"path": "__PKG_NAME__/diagnostics"
+		}
+	},
+	"admin/services/__PKG_NAME__/dashboard": {
+		"title": "Dashboard",
+		"order": 40,
+		"action": {
+			"type": "view",
+			"path": "__PKG_NAME__/dashboard"
+		}
+	}
+}

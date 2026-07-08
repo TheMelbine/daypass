@@ -1,0 +1,201 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: luci-app\n"
+"Report-Msgid-Bugs-To: \n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Selective transparent proxy. Paste a proxy link and choose which lists route through it; everything else is routed directly by the kernel."
+msgstr ""
+
+msgid "Service"
+msgstr ""
+
+msgid "Enable at boot"
+msgstr ""
+
+msgid "Start %s automatically and route selected traffic through the proxy."
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Running"
+msgstr ""
+
+msgid "Stopped"
+msgstr ""
+
+msgid "Control"
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Stop"
+msgstr ""
+
+msgid "Restart"
+msgstr ""
+
+msgid "Proxy"
+msgstr ""
+
+msgid "One outbound group. Paste a single connection link, list several for auto-selection, or supply raw outbound JSON."
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Single link"
+msgstr ""
+
+msgid "Selector (manual pick)"
+msgstr ""
+
+msgid "URL test (auto fastest)"
+msgstr ""
+
+msgid "Raw outbound JSON"
+msgstr ""
+
+msgid "Proxy link"
+msgstr ""
+
+msgid "vless:// ss:// trojan:// hysteria2:// (hy2://) or socks:// link."
+msgstr ""
+
+msgid "Invalid proxy link"
+msgstr ""
+
+msgid "Proxy links"
+msgstr ""
+
+msgid "One connection link per entry for selector / url-test groups."
+msgstr ""
+
+msgid "Outbound JSON"
+msgstr ""
+
+msgid "Test URL"
+msgstr ""
+
+msgid "Routing"
+msgstr ""
+
+msgid "One routing bucket: pick the community lists (and any custom domains/subnets) that should travel through a proxy."
+msgstr ""
+
+msgid "Which proxy group this bucket routes through."
+msgstr ""
+
+msgid "Community lists"
+msgstr ""
+
+msgid "Domains and subnets in the selected lists are routed through the proxy."
+msgstr ""
+
+msgid "Custom domains"
+msgstr ""
+
+msgid "Custom subnets"
+msgstr ""
+
+msgid "%s — Settings"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "DNS"
+msgstr ""
+
+msgid "Network"
+msgstr ""
+
+msgid "Lists"
+msgstr ""
+
+msgid "Advanced"
+msgstr ""
+
+msgid "DNS protocol"
+msgstr ""
+
+msgid "DNS server"
+msgstr ""
+
+msgid "Bootstrap DNS server"
+msgstr ""
+
+msgid "LAN interfaces"
+msgstr ""
+
+msgid "List update interval"
+msgstr ""
+
+msgid "Every hour"
+msgstr ""
+
+msgid "Daily"
+msgstr ""
+
+msgid "Log level"
+msgstr ""
+
+msgid "API secret"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Disable QUIC"
+msgstr ""
+
+msgid "Do not modify DHCP/DNS"
+msgstr ""
+
+msgid "%s — Diagnostics"
+msgstr ""
+
+msgid "Version"
+msgstr ""
+
+msgid "App"
+msgstr ""
+
+msgid "Core (mihomo)"
+msgstr ""
+
+msgid "Checks"
+msgstr ""
+
+msgid "Config"
+msgstr ""
+
+msgid "nftables"
+msgstr ""
+
+msgid "Core log"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "Running %s…"
+msgstr ""
+
+msgid "(no output)"
+msgstr ""
+
+msgid "Support"
+msgstr ""
+
+msgid "Documentation"
+msgstr ""
+
+msgid "Live proxy dashboard."
+msgstr ""

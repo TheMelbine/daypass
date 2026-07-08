@@ -1,0 +1,9 @@
+node_modules/
+fe-app/dist/
+out/
+*.apk
+*.ipk
+.env
+.DS_Store
+*.log
+.validate/

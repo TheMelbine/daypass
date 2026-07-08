@@ -1,0 +1,16 @@
+# Keep the docker build context small: only branding/ + packages/ (+ Makefile)
+# are consumed by docker/Dockerfile-*. Everything else is noise.
+.git
+.github
+docs
+tests
+fe-app
+out
+**/node_modules
+**/dist
+*.apk
+*.ipk
+*.log
+.DS_Store
+.env
+.validate

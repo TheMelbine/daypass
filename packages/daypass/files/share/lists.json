@@ -1,0 +1,29 @@
+{
+	"base": "__LISTS_BASE__",
+	"lists": [
+		{ "tag": "russia_inside",  "label": "Russia (inside)",   "domains": true, "subnets": false },
+		{ "tag": "russia_outside", "label": "Russia (outside)",  "domains": true, "subnets": false },
+		{ "tag": "ukraine_inside", "label": "Ukraine (inside)",  "domains": true, "subnets": false },
+		{ "tag": "geoblock",       "label": "Geoblock",          "domains": true, "subnets": false },
+		{ "tag": "block",          "label": "Block",             "domains": true, "subnets": false },
+		{ "tag": "youtube",        "label": "YouTube",           "domains": true, "subnets": false },
+		{ "tag": "anime",          "label": "Anime",             "domains": true, "subnets": false },
+		{ "tag": "hdrezka",        "label": "HDRezka",           "domains": true, "subnets": false },
+		{ "tag": "tiktok",         "label": "TikTok",            "domains": true, "subnets": false },
+		{ "tag": "news",           "label": "News",              "domains": true, "subnets": false },
+		{ "tag": "porn",           "label": "Porn",              "domains": true, "subnets": false },
+		{ "tag": "google_ai",      "label": "Google AI",         "domains": true, "subnets": false },
+		{ "tag": "google_play",    "label": "Google Play",       "domains": true, "subnets": false },
+		{ "tag": "hodca",          "label": "HODCA",             "domains": true, "subnets": false },
+		{ "tag": "meta",           "label": "Meta",              "domains": true, "subnets": true },
+		{ "tag": "twitter",        "label": "Twitter / X",       "domains": true, "subnets": true },
+		{ "tag": "discord",        "label": "Discord",           "domains": true, "subnets": true },
+		{ "tag": "telegram",       "label": "Telegram",          "domains": true, "subnets": true },
+		{ "tag": "roblox",         "label": "Roblox",            "domains": true, "subnets": true },
+		{ "tag": "cloudflare",     "label": "Cloudflare",        "domains": true, "subnets": true },
+		{ "tag": "cloudfront",     "label": "CloudFront",        "domains": true, "subnets": true },
+		{ "tag": "digitalocean",   "label": "DigitalOcean",      "domains": true, "subnets": true },
+		{ "tag": "hetzner",        "label": "Hetzner",           "domains": true, "subnets": true },
+		{ "tag": "ovh",            "label": "OVH",               "domains": true, "subnets": true }
+	]
+}

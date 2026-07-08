@@ -1,0 +1,35 @@
+{
+  "name": "fe-app",
+  "version": "1.0.0",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "private": true,
+  "description": "Brand-neutral LuCI fe-app bundle (mihomo + nft TPROXY). Builds htdocs/luci-static/resources/view/app/main.js.",
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "typecheck": "tsc --noEmit",
+    "build": "tsup src/main.ts",
+    "dev": "tsup src/main.ts --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "ci": "eslint src --ext .ts,.tsx --max-warnings=0 && vitest run && tsup src/main.ts",
+    "watch:sftp": "node watch-upload.js"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "8.45.0",
+    "@typescript-eslint/parser": "8.45.0",
+    "chokidar": "4.0.3",
+    "dotenv": "17.2.3",
+    "eslint": "9.36.0",
+    "eslint-config-prettier": "10.1.8",
+    "glob": "11.0.3",
+    "prettier": "3.6.2",
+    "ssh2-sftp-client": "12.0.1",
+    "tsup": "8.5.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.45.0",
+    "vitest": "3.2.4"
+  }
+}
