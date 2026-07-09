@@ -20,39 +20,41 @@ nft_flush_set() {
 	nft flush set inet "$NFT_TABLE" "$1" 2>/dev/null
 }
 
-# nft_load_subnets_from_file <file> [chunk_size]
-# Reads one CIDR/IP per line, validates, and adds to the subnets4 set in chunks
-# so we don't exceed nft command-line limits on huge lists.
+# nft_load_subnets_from_file <file>
+# Reads one IPv4/CIDR per line and loads it into the subnets4 set. A single awk
+# pass validates (IPv4 only — IPv6/junk/comments skipped) and emits an `nft -f`
+# script of batched `add element` statements, applied in ONE transaction.
+#
+# Why not a shell loop: the set is `interval`+`auto-merge`, so a per-chunk
+# `nft add` re-merges the whole growing set, and a per-line `echo|sed`+`grep`
+# loop spawns ~3 subprocesses per line — both unusably slow for the ~29k CIDRs a
+# decompiled ipcidr rule-set produces (minutes, pinned CPU). awk + one `nft -f`
+# does it in a second. Strict validation matters here: `nft -f` is atomic, so a
+# single bad element would fail the entire load — we filter to valid IPv4 only.
 nft_load_subnets_from_file() {
 	local file="$1"
-	local chunk_size="${2:-5000}"
-	local array="" count=0 line
-
 	[ -f "$file" ] || return 0
+	local nftf="/tmp/${PKG_NAME}_nftload.$$"
 
-	while IFS= read -r line; do
-		line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-		[ -z "$line" ] && continue
-		case "$line" in \#*) continue ;; esac
+	awk -v tbl="$NFT_TABLE" -v set="$NFT_SUBNET_SET" '
+		function ok(s,   a, i, n, o) {
+			if (s !~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(\/[0-9]+)?$/) return 0
+			n = split(s, a, /[.\/]/)
+			for (i = 1; i <= 4; i++) { o = a[i] + 0; if (o > 255) return 0 }
+			if (n == 5 && a[5] + 0 > 32) return 0
+			return 1
+		}
+		{
+			sub(/^[ \t]+/, ""); sub(/[ \t]+$/, ""); sub(/#.*/, "")
+			if ($0 == "" || !ok($0)) next
+			if (k == 0) printf "add element inet %s %s { ", tbl, set
+			else printf ", "
+			printf "%s", $0
+			if (++k >= 2000) { printf " }\n"; k = 0 }
+		}
+		END { if (k) printf " }\n" }
+	' "$file" > "$nftf"
 
-		if ! is_ipv4 "$line" && ! is_ipv4_cidr "$line"; then
-			continue
-		fi
-
-		if [ -z "$array" ]; then
-			array="$line"
-		else
-			array="$array,$line"
-		fi
-		count=$((count + 1))
-
-		if [ "$count" = "$chunk_size" ]; then
-			nft_add_elements "$NFT_SUBNET_SET" "$array"
-			array=""
-			count=0
-		fi
-	done < "$file"
-
-	[ -n "$array" ] && nft_add_elements "$NFT_SUBNET_SET" "$array"
-	return 0
+	[ -s "$nftf" ] && nft -f "$nftf"
+	rm -f "$nftf"
 }
