@@ -5,7 +5,7 @@
 ## Установка
 
 ```sh
-wget -O /tmp/daypass-install.sh https://raw.githubusercontent.com/TheMelbine/daypass/master/install.sh && sh /tmp/daypass-install.sh
+sh <(wget -O - https://raw.githubusercontent.com/TheMelbine/daypass/master/install.sh)
 ```
 
 Нужен OpenWrt 24.10 (проверено на Routerich AX3000, `aarch64_cortex-a53`). Скрипт сам определит архитектуру роутера и скачает нужные пакеты.
