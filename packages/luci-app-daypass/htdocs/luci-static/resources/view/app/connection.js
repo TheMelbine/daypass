@@ -251,7 +251,10 @@ return view.extend({
 		});
 
 		return m.render().then(function (mapNode) {
-			return E('div', {}, [
+			return E('div', { 'id': 'dp-conn' }, [
+				E('style', {}, '#dp-conn .cbi-dynlist .cbi-input-text,' +
+					'#dp-conn .cbi-value input.cbi-input-text{' +
+					'min-width:34em;max-width:100%;text-align:left}'),
 				E('h2', {}, '__BRAND_NAME__'),
 				statusBlock(running, uci.get('__PKG_NAME__', 'main', 'enabled') === '1'),
 				E('div', { 'class': 'cbi-section' }, [
