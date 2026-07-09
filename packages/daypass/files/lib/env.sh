@@ -55,24 +55,48 @@ FAKEIP_CIDR="198.18.0.0/16"
 # start. Resolution order: an installed /usr/bin/mihomo, then an already-unpacked
 # copy, then unpack a .gz (uci 'mihomo_gz', else our shipped default).
 MIHOMO_GZ_DEFAULT="/usr/lib/${PKG_NAME}/mihomo.gz"
+# Path the mihomo-gz package installs to (brand-neutral, shared by all brands).
+MIHOMO_GZ_PKG="/usr/lib/mihomo-gz/mihomo.gz"
 MIHOMO_EXTRACTED="/tmp/${PKG_NAME}/mihomo"
+
+# Resolve the gzipped binary: an explicit uci path wins, then the brand default,
+# then the mihomo-gz package location. Echoes the first that exists.
+mihomo_gz_path() {
+	local gz
+	gz="$(uci -q get "${PKG_NAME}.main.mihomo_gz")"
+	for gz in "$gz" "$MIHOMO_GZ_DEFAULT" "$MIHOMO_GZ_PKG"; do
+		[ -n "$gz" ] && [ -f "$gz" ] && { echo "$gz"; return 0; }
+	done
+	return 1
+}
 
 mihomo_bin() {
 	[ -x /usr/bin/mihomo ] && { echo /usr/bin/mihomo; return 0; }
 	[ -x "$MIHOMO_EXTRACTED" ] && { echo "$MIHOMO_EXTRACTED"; return 0; }
 	local gz
-	gz="$(uci -q get "${PKG_NAME}.main.mihomo_gz")"
-	[ -n "$gz" ] || gz="$MIHOMO_GZ_DEFAULT"
-	if [ -f "$gz" ]; then
-		mkdir -p "$(dirname "$MIHOMO_EXTRACTED")"
-		if gunzip -c "$gz" > "$MIHOMO_EXTRACTED" 2>/dev/null; then
-			chmod 0755 "$MIHOMO_EXTRACTED"
-			echo "$MIHOMO_EXTRACTED"
-			return 0
-		fi
-		rm -f "$MIHOMO_EXTRACTED"
+	gz="$(mihomo_gz_path)" || return 1
+	mkdir -p "$(dirname "$MIHOMO_EXTRACTED")"
+	if gunzip -c "$gz" > "$MIHOMO_EXTRACTED" 2>/dev/null; then
+		chmod 0755 "$MIHOMO_EXTRACTED"
+		echo "$MIHOMO_EXTRACTED"
+		return 0
 	fi
+	rm -f "$MIHOMO_EXTRACTED"
 	return 1
+}
+
+# mihomo restricts external-ui and file rule-providers to its home dir unless
+# their locations are listed in SAFE_PATHS. Build that list: the bundled UI dir,
+# the dir holding a reused gzipped mihomo, and the dirs of any file rulesets.
+safe_paths() {
+	local sp="$UI_DIR" gz f d
+	gz="$(mihomo_gz_path)"
+	[ -n "$gz" ] && sp="$sp:$(dirname "$gz")"
+	for f in $(uci -q show "$PKG_NAME" | sed -n "s/^${PKG_NAME}\.[^.]*\.file='\(.*\)'\$/\1/p"); do
+		d="$(dirname "$f")"
+		case ":$sp:" in *":$d:"*) ;; *) sp="$sp:$d" ;; esac
+	done
+	echo "$sp"
 }
 
 log() {

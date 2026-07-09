@@ -47,7 +47,7 @@ jobs:
           docker cp daypass-ci:/builder/bin/packages ./binpkgs
           docker rm daypass-ci
           mkdir -p dist
-          for pat in 'mihomo_*' 'daypass_*' 'luci-app-daypass_*' 'luci-i18n-daypass-*'; do
+          for pat in 'mihomo_*' 'mihomo-gz_*' 'daypass_*' 'luci-app-daypass_*' 'luci-i18n-daypass-*'; do
             find ./binpkgs -name "$pat.ipk" -exec cp {} dist/ \;
           done
           echo "Artifacts:"; ls -la dist
