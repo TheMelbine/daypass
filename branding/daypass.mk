@@ -1,9 +1,9 @@
 # branding/daypass.mk — open-source brand (default).
 BRAND_PKG        := daypass
 BRAND_NAME       := Daypass
-BRAND_URL        := https://github.com/you/daypass
-BRAND_SUPPORT    := https://github.com/you/daypass/issues
-BRAND_DOCS       := https://github.com/you/daypass#readme
+BRAND_URL        := https://github.com/TheMelbine/daypass
+BRAND_SUPPORT    := https://github.com/TheMelbine/daypass/issues
+BRAND_DOCS       := https://github.com/TheMelbine/daypass#readme
 BRAND_LISTS      := https://github.com/itdoginfo/allow-domains/releases/latest/download
 BRAND_ACCENT     := #2e7d32
 BRAND_DASHBOARD  := zashboard
