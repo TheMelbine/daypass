@@ -16,18 +16,47 @@ config settings 'settings'
 	option disable_quic '0'
 	option dont_touch_dhcp '0'
 	option shutdown_correctly '1'
+	# selective: only listed domains/subnets go through mihomo (efficient).
+	# full: all LAN traffic is tproxied to mihomo, so every rule (incl. ipcidr)
+	# applies and MATCH defaults to DIRECT. Use 'full' for rich custom rule sets.
+	option routing_mode 'selective'
+	# Raw mihomo rule lines. prepend_rules run FIRST (DIRECT/REJECT exceptions,
+	# private-IP bypasses); append_rules run after generated rules, before MATCH.
+	#list prepend_rules 'AND,((NETWORK,udp),(DST-PORT,443)),REJECT'
+	#list prepend_rules 'IP-CIDR,10.0.0.0/8,DIRECT,no-resolve'
+	#list prepend_rules 'IP-CIDR,192.168.0.0/16,DIRECT,no-resolve'
 
-# Example outbound. Paste a vless://, ss://, trojan:// or hysteria2:// string
-# into proxy_string, set enabled '1', and reference this section from a route.
-# (UCI section names must be unique across the whole file, so this is 'proxy',
-# not 'main'.)
-config proxy 'proxy'
+# Subscription (mihomo proxy-provider). mihomo fetches + health-checks it.
+#config subscription 'lagom'
+#	option enabled '1'
+#	option url 'https://example.com/sub'
+#	option interval '3600'
+#	option user_agent 'clash.meta'
+#	option health_check_url 'https://www.gstatic.com/generate_204'
+#	option health_check_interval '300'
+
+# Proxy group. Members come from: proxy_string (one URL), links (many URLs),
+# outbound_json (raw mihomo proxy), and/or subscriptions (proxy-providers).
+config proxy 'PROXY'
 	option enabled '0'
-	option type 'url'
+	option type 'select'
 	option proxy_string ''
+	#list links 'vless://...'
+	#list subscriptions 'lagom'
+	#option include_direct '1'
 
-# Example routing bucket: which lists go through which proxy.
+# Custom rule-provider. behavior: domain|ipcidr|classical; format: mrs|yaml|text;
+# action: PROXY|DIRECT|REJECT or a proxy group name.
+#config ruleset 'ads'
+#	option enabled '1'
+#	option url 'https://example.com/ads.mrs'
+#	option behavior 'domain'
+#	option format 'mrs'
+#	option action 'REJECT'
+#	option interval '86400'
+
+# Routing bucket for community lists / inline domains -> a proxy group.
 config route 'route'
 	option enabled '0'
-	option proxy 'proxy'
+	option proxy 'PROXY'
 	list community_lists 'russia_inside'

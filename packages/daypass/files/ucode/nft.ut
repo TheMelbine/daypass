@@ -1,8 +1,12 @@
 {%-
 // /usr/share/__PKG_NAME__/ucode/nft.ut — nftables ruleset template.
-// Rendered as: ucode -S nft.ut | nft -f -
+// Rendered as: ucode -T nft.ut | nft -f -
 // Topology and marks per docs/CONTRACT.md. The tproxy port comes from the same
 // constants the config generator uses, so the two can never disagree.
+//
+// Mode-dependent rules are built as strings here and emitted via {{ }} (which
+// does not trim newlines) rather than {% if %} blocks in the body (ucode's -T
+// strips newlines around block tags, which would merge nft rules onto one line).
 'use strict';
 import * as C from '/usr/share/__PKG_NAME__/ucode/constants.uc';
 import { cursor } from 'uci';
@@ -14,6 +18,21 @@ let ifaces = uci_array(uci.get(C.PKG_NAME, 'settings', 'source_network_interface
 if (length(ifaces) == 0) ifaces = [ 'br-lan' ];
 let ifset = join(', ', map(ifaces, (x) => '"' + x + '"'));
 const M = C.TPROXY_MARK_HEX;
+const IF = '@' + C.NFT_IFACE_SET;
+const NL = '\n\t\t';
+
+// full: tproxy ALL lan traffic (except local) so mihomo's entire rule set (incl.
+// ipcidr on real dst) applies. selective: only fake-ip destinations and the
+// subnet set are marked.
+let full = (uci.get(C.PKG_NAME, 'settings', 'routing_mode') == 'full');
+let lan_mark;
+if (full) {
+	lan_mark = 'iifname ' + IF + ' ip daddr @' + C.NFT_LOCAL_SET + ' return' + NL +
+		'iifname ' + IF + ' meta l4proto { tcp, udp } meta mark set ' + M + ' counter';
+} else {
+	lan_mark = 'iifname ' + IF + ' ip daddr @' + C.NFT_SUBNET_SET + ' meta l4proto { tcp, udp } meta mark set ' + M + ' counter' + NL +
+		'iifname ' + IF + ' ip daddr ' + C.FAKEIP_NFT + ' meta l4proto { tcp, udp } meta mark set ' + M + ' counter';
+}
 -%}
 table inet {{ C.NFT_TABLE }} {
 	set {{ C.NFT_LOCAL_SET }} {
@@ -37,8 +56,7 @@ table inet {{ C.NFT_TABLE }} {
 	chain mangle {
 		type filter hook prerouting priority -150; policy accept;
 		ct status dnat return
-		iifname @{{ C.NFT_IFACE_SET }} ip daddr @{{ C.NFT_SUBNET_SET }} meta l4proto { tcp, udp } meta mark set {{ M }} counter
-		iifname @{{ C.NFT_IFACE_SET }} ip daddr {{ C.FAKEIP_NFT }} meta l4proto { tcp, udp } meta mark set {{ M }} counter
+		{{ lan_mark }}
 	}
 
 	chain mangle_output {
