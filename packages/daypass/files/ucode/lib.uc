@@ -1,7 +1,7 @@
 // /usr/share/__PKG_NAME__/ucode/lib.uc — helpers (module).
 // UCI coercion helpers adapted from nikki include.uc:21-51; URL helpers are
 // new and deliberately structural (split BEFORE percent-decoding each part) to
-// avoid podkop's '+'->space and %26 corruption bugs.
+// avoid '+'->space and %26 corruption bugs.
 'use strict';
 
 function uci_bool(v) {

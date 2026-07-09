@@ -1,4 +1,4 @@
-// eslint.config.js — flat config, adapted from fe-app-podkop.
+// eslint.config.js — flat config for the fe-app bundle.
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';

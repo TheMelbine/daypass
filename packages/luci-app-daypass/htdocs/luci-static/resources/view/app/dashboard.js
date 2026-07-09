@@ -6,7 +6,7 @@
 
 /* Mounts the fe-app DashboardTab. A synthetic TypedSection (cfgsections forced to
  * ['dashboard']) carries a single rawhtml DummyValue whose cfgvalue initialises the
- * controller and returns the rendered node — the exact podkop mount pattern. */
+ * controller and returns the rendered node. */
 return view.extend({
 	load: function () {
 		return uci.load('__PKG_NAME__');

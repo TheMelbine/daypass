@@ -68,7 +68,7 @@ docker build \
   -t "$PKG_IMAGE" \
   "$REPO_ROOT"
 
-# 3. Extract artifacts (docker create + docker cp, mirroring podkop's build.yml).
+# 3. Extract artifacts (docker create + docker cp).
 echo ">> Extracting *.$FORMAT artifacts to $OUT_DIR"
 rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR"

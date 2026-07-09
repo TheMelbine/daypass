@@ -7,7 +7,7 @@
 'require fs';
 
 // LuCI runs on browsers that predate structuredClone; keep a tiny shim so shared
-// helpers can rely on it. (Matches fe-app-podkop.)
+// helpers can rely on it.
 if (typeof structuredClone !== 'function')
   globalThis.structuredClone = (obj: unknown) =>
     JSON.parse(JSON.stringify(obj));
