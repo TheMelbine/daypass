@@ -49,10 +49,13 @@ list_update() {
 	rm -rf "$_lu_tmp"
 	mkdir -p "$_lu_tmp"
 
-	local section proxy enabled tag url n=0
+	local section proxy enabled tag url n=0 routing_mode
 
 	# Collect subnet sources from every enabled route section.
 	config_load "$PKG_NAME" 2>/dev/null
+
+	routing_mode="$(uci -q get "${PKG_NAME}.settings.routing_mode")"
+	[ -n "$routing_mode" ] || routing_mode="selective"
 
 	_lu_collect_route() {
 		local s="$1"
@@ -81,7 +84,54 @@ list_update() {
 		echo "$1" >> "${_lu_tmp}/user.lst"
 	}
 
+	# In selective mode, ipcidr rule-sets must have their CIDRs in the nft set so
+	# the traffic is marked and reaches mihomo (mihomo's own RULE-SET then routes
+	# it). We get the CIDRs straight out of the rule-set file: mihomo compiles
+	# .mrs one-way, but `convert-ruleset ipcidr mrs <in> <out>` dumps it back to
+	# plain CIDR text — no external list or decompiler needed. yaml/text/classical
+	# rule-sets are already text; strip any "IP-CIDR," prefix. In full mode every
+	# LAN packet is marked anyway, so this whole pass is skipped.
+	_lu_ruleset() {
+		local s="$1" beh fmt file url ext src out mb
+		config_get enabled "$s" enabled 0
+		[ "$enabled" = "1" ] || return 0
+		config_get beh "$s" behavior domain
+		[ "$beh" = "ipcidr" ] || return 0
+		config_get fmt "$s" format mrs
+		config_get file "$s" file ""
+		config_get url "$s" url ""
+
+		if [ -n "$file" ]; then
+			src="$file"
+		else
+			case "$fmt" in mrs) ext=mrs ;; yaml) ext=yaml ;; *) ext=txt ;; esac
+			src="${PROVIDERS_DIR}/rule/${s}.${ext}"
+			# mihomo may not have fetched it yet (async on boot); grab our own copy.
+			[ -f "$src" ] || { _lu_download "$url" "${_lu_tmp}/rs_${s}.${ext}" \
+				&& src="${_lu_tmp}/rs_${s}.${ext}"; }
+		fi
+		[ -f "$src" ] || { log "ruleset $s: source missing ($src)"; return 0; }
+
+		out="${_lu_tmp}/rs_${s}.lst"
+		case "$fmt" in
+			mrs)
+				mb="$(mihomo_bin)" || { log "ruleset $s: no mihomo to decompile mrs"; return 0; }
+				"$mb" convert-ruleset ipcidr mrs "$src" "$out" >/dev/null 2>&1 \
+					|| { log "ruleset $s: mrs decompile failed"; rm -f "$out"; return 0; }
+				;;
+			yaml)
+				sed -n 's/^[[:space:]]*-[[:space:]]*//p' "$src" > "$out"
+				;;
+			*)
+				sed -e 's/^[[:space:]]*//' -e 's/^IP-CIDR6\{0,1\},//' -e 's/,.*$//' "$src" > "$out"
+				;;
+		esac
+		n=$((n + 1))
+		log "ruleset $s: loaded $(wc -l < "$out" 2>/dev/null) cidrs from $fmt"
+	}
+
 	config_foreach _lu_collect_route route
+	[ "$routing_mode" = "selective" ] && config_foreach _lu_ruleset ruleset
 
 	# Reload the set atomically-ish: flush then bulk-load everything we fetched.
 	nft_flush_set "$NFT_SUBNET_SET"
