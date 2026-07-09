@@ -23,7 +23,7 @@ sh <(wget -O - https://raw.githubusercontent.com/TheMelbine/daypass/master/insta
 
 ## Как это работает
 
-mihomo в режиме `fake-ip-filter-mode: whitelist` выдаёт fake-ip только для доменов из списков, а внешний nftables заворачивает эти соединения в TPROXY. Подсети из rule-set попадают в тот же nft-набор. Списки `.mrs` daypass сам разворачивает в CIDR через mihomo — готовые текстовые версии не нужны.
+mihomo в режиме `fake-ip-filter-mode: whitelist` выдаёт fake-ip только для доменов из списков, а внешний nftables заворачивает эти соединения в TPROXY. Подсети из rule-set попадают в тот же nft-набор.
 
 Детали (nft, метки, порты, UCI, конфиг mihomo) — в [`docs/CONTRACT.md`](docs/CONTRACT.md).
 
