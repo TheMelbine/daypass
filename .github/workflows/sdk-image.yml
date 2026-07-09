@@ -1,0 +1,42 @@
+name: sdk-image
+
+# Bakes the daypass SDK image (docker/Dockerfile.sdk) and pushes it to GHCR.
+# Runs only when the SDK definition changes or on demand — NOT on normal pushes.
+# This is the slow (~10 min once) step so that every package build stays fast.
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths:
+      - 'docker/Dockerfile.sdk'
+      - '.github/workflows/sdk-image.yml'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  bake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # GHCR paths must be lowercase; the owner login may not be.
+      - id: vars
+        run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile.sdk
+          push: true
+          tags: ghcr.io/${{ steps.vars.outputs.owner }}/daypass-sdk:openwrt-24.10
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
