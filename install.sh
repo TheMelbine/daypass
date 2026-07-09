@@ -57,11 +57,19 @@ check_system() {
 
 	[ -n "$ARCH" ] || die "Could not detect DISTRIB_ARCH from /etc/openwrt_release."
 
-	# flash space (need ~20MB: mihomo ~15MB + our packages)
+	# flash space. The full mihomo binary is ~43MB unpacked; on tight flash we
+	# install the gzipped package (~16MB) and unpack to tmpfs at runtime instead.
 	space=$(df /overlay 2>/dev/null | awk 'NR==2 {print $4}')
 	if [ -n "$space" ] && [ "$space" -lt 20480 ]; then
 		die "Not enough free space on /overlay: $((space/1024))MB (need ~20MB)."
 	fi
+
+	# Pick the mihomo flavour by free flash.
+	MIHOMO_VARIANT=mihomo
+	if [ -z "$space" ] || [ "$space" -lt 61440 ]; then
+		MIHOMO_VARIANT=mihomo-gz
+	fi
+	msg "mihomo flavour: $MIHOMO_VARIANT (free: $((${space:-0}/1024))MB)"
 
 	nslookup openwrt.org >/dev/null 2>&1 || die "DNS is not working — fix connectivity first."
 }
@@ -93,9 +101,13 @@ download_release() {
 	local got=0 url name
 	for url in $urls; do
 		name=$(basename "$url")
+		# mihomo-gz must be tested before mihomo (its name also starts "mihomo-").
 		case "$name" in
+			mihomo-gz[_-]*)
+				[ "$MIHOMO_VARIANT" = "mihomo-gz" ] || continue
+				echo "$name" | grep -q "$ARCH" || continue ;;
 			mihomo[_-]*)
-				# only the asset matching our arch
+				[ "$MIHOMO_VARIANT" = "mihomo" ] || continue
 				echo "$name" | grep -q "$ARCH" || continue ;;
 			${PKG}[_-]*|luci-app-${PKG}[_-]*|luci-i18n-${PKG}-*) : ;;
 			*) continue ;;
@@ -118,14 +130,20 @@ _fetch() {
 }
 
 install_packages() {
-	# order matters: mihomo (dependency) -> core -> luci-app
+	# order matters: mihomo core (satisfies daypass's dep) -> core -> luci-app
 	local f
-	for pat in "mihomo" "${PKG}" "luci-app-${PKG}"; do
+	for pat in "$MIHOMO_VARIANT" "${PKG}" "luci-app-${PKG}"; do
 		f=$(ls "$DOWNLOAD_DIR"/${pat}[_-]*."$EXT" 2>/dev/null | head -1)
-		[ -n "$f" ] || { [ "$pat" = "mihomo" ] && die "mihomo package missing from release"; continue; }
+		[ -n "$f" ] || { [ "$pat" = "$MIHOMO_VARIANT" ] && die "$MIHOMO_VARIANT package missing from release"; continue; }
 		msg "Installing $(basename "$f")..."
 		pkg_install_file "$f" || die "install failed: $(basename "$f")"
 	done
+
+	# Point daypass at the gzipped binary when we installed the gz flavour.
+	if [ "$MIHOMO_VARIANT" = "mihomo-gz" ]; then
+		uci -q set "${PKG}.main.mihomo_gz=/usr/lib/mihomo-gz/mihomo.gz"
+		uci -q commit "${PKG}"
+	fi
 
 	# optional Russian LuCI translation
 	local ru

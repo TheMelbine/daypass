@@ -23,8 +23,9 @@ COPY --chown=1000:1000 branding /src/branding
 # two arch-all packages have nothing to cross-compile.
 RUN echo "src-link daypass /src" >> feeds.conf && \
 	./scripts/feeds update daypass && \
-	./scripts/feeds install -p daypass -f mihomo daypass luci-app-daypass && \
+	./scripts/feeds install -p daypass -f mihomo mihomo-gz daypass luci-app-daypass && \
 	make defconfig && \
 	make package/mihomo/compile V=s -j"$(nproc)" && \
+	make package/mihomo-gz/compile V=s -j"$(nproc)" && \
 	make package/daypass/compile V=s -j"$(nproc)" && \
 	make package/luci-app-daypass/compile V=s -j"$(nproc)"
