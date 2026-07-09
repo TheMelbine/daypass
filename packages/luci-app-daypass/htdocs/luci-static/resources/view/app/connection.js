@@ -113,11 +113,16 @@ function nodePicker(proxiesData, provMap) {
 	]);
 	names.forEach(function (g) { tbl.appendChild(groupRow(g, proxies[g], provMap)); });
 
-	const testAll = E('button', { 'class': 'cbi-button cbi-button-neutral', 'style': 'margin-top:.5em' }, _('Test all'));
-	testAll.addEventListener('click', function () {
-		tbl.querySelectorAll('tr.tr button.cbi-button-action').forEach(function (b) { b.click(); });
-	});
-	return E('div', {}, [ tbl, testAll ]);
+	const children = [ tbl ];
+	/* "Test all" only makes sense with more than one group */
+	if (names.length > 1) {
+		const testAll = E('button', { 'class': 'cbi-button cbi-button-neutral', 'style': 'margin-top:.5em' }, _('Test all'));
+		testAll.addEventListener('click', function () {
+			tbl.querySelectorAll('tr.tr button.cbi-button-action').forEach(function (b) { b.click(); });
+		});
+		children.push(testAll);
+	}
+	return E('div', {}, children);
 }
 
 /* ---------------- status + control (live) ---------------- */
