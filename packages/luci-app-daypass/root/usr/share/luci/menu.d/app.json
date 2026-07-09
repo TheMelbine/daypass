@@ -17,6 +17,22 @@
 			"path": "__PKG_NAME__/connection"
 		}
 	},
+	"admin/services/__PKG_NAME__/subscriptions": {
+		"title": "Subscriptions",
+		"order": 15,
+		"action": {
+			"type": "view",
+			"path": "__PKG_NAME__/subscriptions"
+		}
+	},
+	"admin/services/__PKG_NAME__/rules": {
+		"title": "Rules",
+		"order": 18,
+		"action": {
+			"type": "view",
+			"path": "__PKG_NAME__/rules"
+		}
+	},
 	"admin/services/__PKG_NAME__/settings": {
 		"title": "Settings",
 		"order": 20,

@@ -88,27 +88,42 @@ return view.extend({
 			return L.resolveDefault(api.status(), false).then(setStatus);
 		});
 
-		/* ---------------- Proxy (outbound) ---------------- */
+		/* ---------------- Proxy (outbound group) ---------------- */
 		s = m.section(form.TypedSection, 'proxy', _('Proxy'),
-			_('One outbound group. Paste a single connection link, list several for auto-selection, or supply raw outbound JSON.'));
+			_('A proxy group. Its members can be a single link, several links, subscriptions, and/or raw outbound JSON — combine as needed.'));
 		s.anonymous = false;
 		s.addremove = true;
 
 		o = s.option(form.Flag, 'enabled', _('Enabled'));
 		o.rmempty = false;
 
-		o = s.option(form.ListValue, 'type', _('Type'));
-		o.value('url', _('Single link'));
-		o.value('selector', _('Selector (manual pick)'));
-		o.value('urltest', _('URL test (auto fastest)'));
-		o.value('raw', _('Raw outbound JSON'));
-		o.default = 'url';
+		o = s.option(form.ListValue, 'type', _('Group type'));
+		o.value('select', _('Select (manual pick)'));
+		o.value('url-test', _('URL test (auto fastest)'));
+		o.value('fallback', _('Fallback (first alive)'));
+		o.default = 'select';
+
+		o = s.option(form.MultiValue, 'subscriptions', _('Subscriptions'),
+			_('Proxy-providers this group draws nodes from. Manage them on the Subscriptions page.'));
+		o.display_size = 8;
+		uci.sections('__PKG_NAME__', 'subscription').forEach(function (sub) {
+			o.value(sub['.name'], sub['.name']);
+		});
+		o.load = function (section_id) {
+			return uci.get('__PKG_NAME__', section_id, 'subscriptions') || [];
+		};
+		o.write = function (section_id, value) {
+			uci.set('__PKG_NAME__', section_id, 'subscriptions', L.toArray(value));
+		};
+		o.remove = function (section_id) {
+			uci.unset('__PKG_NAME__', section_id, 'subscriptions');
+		};
 
 		o = s.option(form.TextValue, 'proxy_string', _('Proxy link'),
-			_('vless:// ss:// trojan:// hysteria2:// (hy2://) or socks:// link.'));
+			_('A single vless:// ss:// trojan:// hysteria2:// (hy2://) or socks:// link.'));
 		o.rows = 3;
 		o.wrap = 'off';
-		o.depends('type', 'url');
+		o.optional = true;
 		o.validate = function (section_id, value) {
 			if (!value)
 				return true;
@@ -119,9 +134,8 @@ return view.extend({
 		};
 
 		o = s.option(form.DynamicList, 'links', _('Proxy links'),
-			_('One connection link per entry for selector / url-test groups.'));
-		o.depends('type', 'selector');
-		o.depends('type', 'urltest');
+			_('One connection link per entry.'));
+		o.optional = true;
 		o.validate = function (section_id, value) {
 			if (!value)
 				return true;
@@ -131,16 +145,21 @@ return view.extend({
 			return (res && res.error) ? res.error : _('Invalid proxy link');
 		};
 
+		o = s.option(form.Flag, 'include_direct', _('Include DIRECT'),
+			_('Add a DIRECT entry to the group (useful as a manual bypass option).'));
+		o.optional = true;
+
 		o = s.option(form.TextValue, 'outbound_json', _('Outbound JSON'),
 			_('Raw mihomo outbound object (advanced).'));
 		o.rows = 6;
 		o.wrap = 'off';
-		o.depends('type', 'raw');
+		o.optional = true;
 
 		o = s.option(form.Value, 'test_url', _('Test URL'),
-			_('Health-check URL for url-test groups.'));
+			_('Health-check URL for url-test / fallback groups.'));
 		o.placeholder = 'https://www.gstatic.com/generate_204';
-		o.depends('type', 'urltest');
+		o.depends('type', 'url-test');
+		o.depends('type', 'fallback');
 		o.optional = true;
 
 		/* ---------------- Route (which lists via which proxy) ---------------- */
