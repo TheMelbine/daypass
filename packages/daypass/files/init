@@ -57,7 +57,7 @@ start_service() {
 	procd_set_param command /bin/sh -c "exec ${mihomo} -d ${HOME_DIR} >> ${LOG_PATH} 2>&1"
 	procd_set_param file "$CONFIG_PATH"
 	# external-ui lives outside the home dir; allow it (mihomo path-safety guard)
-	procd_set_param env SAFE_PATHS="${UI_DIR}"
+	procd_set_param env SAFE_PATHS="$("$CLI" safe_paths 2>/dev/null || echo "$UI_DIR")"
 	procd_set_param respawn
 	procd_set_param limits nofile="65536 65536"
 	procd_set_param stdout 1
