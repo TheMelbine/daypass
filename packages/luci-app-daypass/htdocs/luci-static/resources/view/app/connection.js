@@ -160,7 +160,7 @@ return view.extend({
 
 		let m, s, o;
 
-		m = new form.Map('__PKG_NAME__', '__BRAND_NAME__');
+		m = new form.Map('__PKG_NAME__');
 
 		/* subscriptions (add a URL — that's the whole setup) */
 		s = m.section(form.GridSection, 'subscription', _('Subscriptions'),
@@ -230,6 +230,7 @@ return view.extend({
 
 		return m.render().then(function (mapNode) {
 			return E('div', {}, [
+				E('h2', {}, '__BRAND_NAME__'),
 				statusBlock(running, uci.get('__PKG_NAME__', 'main', 'enabled') === '1'),
 				E('div', { 'class': 'cbi-section' }, [
 					E('h3', {}, _('Node')),
