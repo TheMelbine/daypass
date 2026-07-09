@@ -13,16 +13,10 @@ msgstr ""
 msgid "%s — Diagnostics"
 msgstr ""
 
-msgid "%s — Proxies"
-msgstr ""
-
 msgid "%s — Rules"
 msgstr ""
 
 msgid "%s — Settings"
-msgstr ""
-
-msgid "%s — Subscriptions"
 msgstr ""
 
 msgid "%s → %s"
@@ -34,7 +28,7 @@ msgstr ""
 msgid "(no output)"
 msgstr ""
 
-msgid "A proxy group. Its members can be a single link, several links, subscriptions, and/or raw outbound JSON — combine as needed."
+msgid "A single link is optional — with subscriptions above you can leave it empty."
 msgstr ""
 
 msgid "A single vless:// ss:// trojan:// hysteria2:// (hy2://) or socks:// link."
@@ -49,7 +43,7 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-msgid "Add a DIRECT entry to the group (useful as a manual bypass option)."
+msgid "Add a subscription below, then Save & Apply — your nodes appear here."
 msgstr ""
 
 msgid "Advanced"
@@ -89,6 +83,9 @@ msgid "Config"
 msgstr ""
 
 msgid "Connection"
+msgstr ""
+
+msgid "Connection method"
 msgstr ""
 
 msgid "Core (mihomo)"
@@ -208,9 +205,6 @@ msgstr ""
 msgid "Health-check URL"
 msgstr ""
 
-msgid "Health-check URL for url-test / fallback groups."
-msgstr ""
-
 msgid "Health-check interval (s)"
 msgstr ""
 
@@ -244,9 +238,6 @@ msgstr ""
 msgid "Hysteria2 URL must start with hysteria2:// or hy2://"
 msgstr ""
 
-msgid "Include DIRECT"
-msgstr ""
-
 msgid "Info"
 msgstr ""
 
@@ -263,6 +254,9 @@ msgid "List update interval"
 msgstr ""
 
 msgid "Lists"
+msgstr ""
+
+msgid "Lists to route"
 msgstr ""
 
 msgid "Live proxy dashboard."
@@ -286,25 +280,16 @@ msgstr ""
 msgid "Network"
 msgstr ""
 
-msgid "No proxy groups found. Is the service running and are subscriptions loaded?"
-msgstr ""
-
 msgid "Node"
-msgstr ""
-
-msgid "One connection link per entry."
-msgstr ""
-
-msgid "One routing bucket: pick the community lists (and any custom domains/subnets) that should travel through a proxy."
 msgstr ""
 
 msgid "Open dashboard"
 msgstr ""
 
-msgid "Outbound JSON"
+msgid "PROXY, DIRECT, REJECT or a proxy group name."
 msgstr ""
 
-msgid "PROXY, DIRECT, REJECT or a proxy group name."
+msgid "Paste a subscription (proxy-provider) link. Its nodes show up in the picker above."
 msgstr ""
 
 msgid "Path to a gzipped mihomo binary to unpack to tmpfs when /usr/bin/mihomo is absent (small-flash routers). Empty uses the shipped default."
@@ -313,7 +298,7 @@ msgstr ""
 msgid "Pick a check above."
 msgstr ""
 
-msgid "Pick which node each Select group uses. Auto-select groups (URL-test / Fallback) are read-only. Selection is live and persists across restarts. Use Test to measure per-node latency."
+msgid "Pick the community lists (and any custom domains/subnets) that should travel through a proxy."
 msgstr ""
 
 msgid "Plain IP (recommended) or a DoH/DoT URL. Used when the Nameservers list is empty."
@@ -323,9 +308,6 @@ msgid "Plain-IP resolver used to look up DoH/DoT server hostnames."
 msgstr ""
 
 msgid "Protocol for the single DNS server below. For several resolvers use the Nameservers list instead."
-msgstr ""
-
-msgid "Proxies"
 msgstr ""
 
 msgid "Proxy"
@@ -340,16 +322,7 @@ msgstr ""
 msgid "Proxy link"
 msgstr ""
 
-msgid "Proxy links"
-msgstr ""
-
-msgid "Proxy-providers this group draws nodes from. Manage them on the Subscriptions page."
-msgstr ""
-
 msgid "Proxy-server nameservers"
-msgstr ""
-
-msgid "Raw mihomo outbound object (advanced)."
 msgstr ""
 
 msgid "Raw mihomo rule lines applied after the generated rules, before the final MATCH."
@@ -419,9 +392,6 @@ msgid "Select (manual pick)"
 msgstr ""
 
 msgid "Selective (efficient)"
-msgstr ""
-
-msgid "Selective transparent proxy. Paste a proxy link and choose which lists route through it; everything else is routed directly by the kernel."
 msgstr ""
 
 msgid "Selective: only listed domains/subnets reach mihomo (efficient). Full: all LAN traffic is tproxied to mihomo, so every rule (incl. ipcidr) applies and unmatched traffic goes DIRECT."
@@ -497,9 +467,6 @@ msgid "Support"
 msgstr ""
 
 msgid "Test"
-msgstr ""
-
-msgid "Test URL"
 msgstr ""
 
 msgid "Test all"
@@ -584,9 +551,6 @@ msgid "http(s) rule-provider URL (leave empty for a local file)."
 msgstr ""
 
 msgid "ipcidr"
-msgstr ""
-
-msgid "mihomo proxy-providers. Each subscription URL is fetched and health-checked by mihomo; reference a subscription by name from a proxy group on the Connection page."
 msgstr ""
 
 msgid "n/a"
