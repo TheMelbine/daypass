@@ -1,0 +1,32 @@
+name: fe-ci
+
+# Verifies the committed LuCI fe-app bundle (main.js) is in sync with its source.
+# Cheap (node only, no SDK) and only relevant when the frontend changes, so it is
+# path-filtered instead of riding along with every build.
+on:
+  push:
+    paths:
+      - 'fe-app/**'
+      - 'packages/luci-app-daypass/htdocs/luci-static/resources/view/app/main.js'
+      - '.github/workflows/fe-ci.yml'
+  pull_request:
+    paths:
+      - 'fe-app/**'
+
+jobs:
+  fe-freshness:
+    name: fe-app bundle is fresh
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build the committed bundle and diff it
+        run: |
+          cd fe-app
+          npm ci
+          npm run ci    # lint + test + build (writes the committed main.js)
+          cd ..
+          git diff --exit-code -- packages/luci-app-daypass/htdocs/luci-static/resources/view/app/main.js \
+            || { echo "::error::committed fe-app bundle is stale — run 'make fe' and commit main.js"; exit 1; }

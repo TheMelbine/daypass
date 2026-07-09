@@ -1,0 +1,26 @@
+# Pre-baked OpenWrt SDK image for daypass CI.
+#
+# The stock openwrt/gh-action-sdk action re-runs the slow prep on every build:
+# `feeds update -a` clones the base/luci/packages/routing/telephony feeds, then
+# `make defconfig` initialises the toolchain — together ~4 min. We bake that in
+# here ONCE so the per-build image (docker/Dockerfile.build) only has to COPY our
+# package sources and `make compile` (seconds). Same trick podkop uses with its
+# itdoginfo/openwrt-sdk-ipk base image.
+#
+# Rebuild + push this image only when SDK_IMAGE (the OpenWrt version/arch) changes
+# — the sdk-image workflow does that. Downstream builds pull the cached result.
+
+ARG SDK_IMAGE=ghcr.io/openwrt/sdk:aarch64_cortex-a53-openwrt-24.10
+FROM ${SDK_IMAGE}
+
+# The SDK image runs as its unprivileged build user (uid 1000) with WORKDIR
+# /builder; every command below runs there. Mirror the feed URLs to github the
+# same way gh-action-sdk's entrypoint does (git.openwrt.org is slower/flakier),
+# then clone all feeds and initialise the config — the expensive, cacheable part.
+RUN sed \
+		-e 's,https://git.openwrt.org/feed/,https://github.com/openwrt/,' \
+		-e 's,https://git.openwrt.org/openwrt/,https://github.com/openwrt/,' \
+		-e 's,https://git.openwrt.org/project/,https://github.com/openwrt/,' \
+		feeds.conf.default > feeds.conf && \
+	./scripts/feeds update -a && \
+	make defconfig

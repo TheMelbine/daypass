@@ -1,0 +1,25 @@
+# Per-build image: compile the daypass .ipk on top of the pre-baked SDK.
+#
+# Everything slow (SDK extract, feeds clone, defconfig) already lives in the
+# base image, so this stage just drops our package sources into a src-link feed
+# and compiles them — the actual work is seconds. The build.yml workflow then
+# copies bin/packages/**/*.ipk out of the resulting container.
+
+ARG SDK_IMAGE=ghcr.io/themelbine/daypass-sdk:openwrt-24.10
+FROM ${SDK_IMAGE}
+
+# Our three packages become a local feed named "daypass" rooted at /feed. `-f`
+# on install forces our mihomo (a prebuilt-binary package) to override the same
+# name in the official packages feed. mihomo's PKG_SOURCE is downloaded during
+# compile; the two arch-all packages have nothing to cross-compile.
+COPY --chown=1000:1000 packages/mihomo           /feed/mihomo
+COPY --chown=1000:1000 packages/daypass          /feed/daypass
+COPY --chown=1000:1000 packages/luci-app-daypass /feed/luci-app-daypass
+
+RUN echo "src-link daypass /feed" >> feeds.conf && \
+	./scripts/feeds update daypass && \
+	./scripts/feeds install -p daypass -f mihomo daypass luci-app-daypass && \
+	make defconfig && \
+	make package/mihomo/compile V=s -j"$(nproc)" && \
+	make package/daypass/compile V=s -j"$(nproc)" && \
+	make package/luci-app-daypass/compile V=s -j"$(nproc)"
