@@ -13,11 +13,14 @@
 ARG SDK_IMAGE=ghcr.io/openwrt/sdk:aarch64_cortex-a53-openwrt-24.10
 FROM ${SDK_IMAGE}
 
-# The SDK image runs as its unprivileged build user (uid 1000) with WORKDIR
-# /builder; every command below runs there. Mirror the feed URLs to github the
-# same way gh-action-sdk's entrypoint does (git.openwrt.org is slower/flakier),
-# then clone all feeds and initialise the config — the expensive, cacheable part.
-RUN sed \
+# The SDK image runs as its unprivileged build user with WORKDIR /builder but
+# ships only setup.sh — the SDK tarball is downloaded+extracted on first use
+# (setup.sh uses the arch/version baked into the image ENV). gh-action-sdk's
+# entrypoint runs it first; so do we. Then mirror the feed URLs to github the
+# same way (git.openwrt.org is slower/flakier), clone all feeds and initialise
+# the config — the expensive, cacheable part we're baking in.
+RUN bash setup.sh && \
+	sed \
 		-e 's,https://git.openwrt.org/feed/,https://github.com/openwrt/,' \
 		-e 's,https://git.openwrt.org/openwrt/,https://github.com/openwrt/,' \
 		-e 's,https://git.openwrt.org/project/,https://github.com/openwrt/,' \
