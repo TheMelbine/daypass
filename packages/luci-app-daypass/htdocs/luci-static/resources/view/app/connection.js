@@ -24,9 +24,9 @@ function fmtDelay(d) {
 function applyDelays(sel, cell, map) {
 	Array.from(sel.options).forEach(function (opt) {
 		const name = opt.getAttribute('data-name') || opt.value;
-		opt.setAttribute('data-name', name);
+		const label = opt.getAttribute('data-label') || name;
 		const d = map ? map[name] : null;
-		opt.textContent = name + '  ·  ' + fmtDelay(d);
+		opt.textContent = label + '  ·  ' + fmtDelay(d);
 	});
 	cell.textContent = fmtDelay(map ? map[sel.value] : null);
 }
@@ -49,7 +49,7 @@ function switchNode(group, name, sel) {
 		.finally(function () { sel.disabled = false; });
 }
 
-function groupRow(group, info) {
+function groupRow(group, info, provMap) {
 	const nodes = info.all || [];
 	const isSelector = (info.type === 'Selector');
 
@@ -58,7 +58,10 @@ function groupRow(group, info) {
 		'style': 'min-width:18em;max-width:100%',
 		'disabled': isSelector ? null : 'disabled'
 	}, nodes.map(function (n) {
-		return E('option', { 'value': n, 'data-name': n, 'selected': (n === info.now) ? 'selected' : null }, [ n ]);
+		const prov = provMap && provMap[n];
+		const label = prov ? (n + '  ·  ' + prov) : n;
+		return E('option', { 'value': n, 'data-name': n, 'data-label': label,
+			'selected': (n === info.now) ? 'selected' : null }, [ label ]);
 	}));
 
 	const cell = E('td', { 'class': 'td left', 'style': 'white-space:nowrap;color:#888' }, '—');
@@ -76,7 +79,21 @@ function groupRow(group, info) {
 	]);
 }
 
-function nodePicker(proxiesData) {
+/* nodeName -> subscription name, via the proxy-providers list */
+function providerMap(provData) {
+	const map = {};
+	const provs = (provData && provData.providers) || {};
+	Object.keys(provs).forEach(function (pn) {
+		const p = provs[pn];
+		if (!p || p.vehicleType !== 'HTTP') return;   // only subscriptions
+		(p.proxies || []).forEach(function (nd) {
+			if (nd && nd.name) map[nd.name] = pn.replace(/_$/, '');
+		});
+	});
+	return map;
+}
+
+function nodePicker(proxiesData, provMap) {
 	const proxies = (proxiesData && proxiesData.proxies) || {};
 	const names = Object.keys(proxies).filter(function (k) {
 		return !HIDE[k] && SELECTABLE[proxies[k].type] && (proxies[k].all || []).length;
@@ -94,7 +111,7 @@ function nodePicker(proxiesData) {
 			E('th', { 'class': 'th' }, '')
 		])
 	]);
-	names.forEach(function (g) { tbl.appendChild(groupRow(g, proxies[g])); });
+	names.forEach(function (g) { tbl.appendChild(groupRow(g, proxies[g], provMap)); });
 
 	const testAll = E('button', { 'class': 'cbi-button cbi-button-neutral', 'style': 'margin-top:.5em' }, _('Test all'));
 	testAll.addEventListener('click', function () {
@@ -150,13 +167,15 @@ return view.extend({
 		return Promise.all([
 			uci.load('__PKG_NAME__'),
 			L.resolveDefault(api.status(), false),
-			L.resolveDefault(api.api('GET', '/proxies'), null)
+			L.resolveDefault(api.api('GET', '/proxies'), null),
+			L.resolveDefault(api.api('GET', '/providers/proxies'), null)
 		]);
 	},
 
 	render: function (data) {
 		const running = data[1];
 		const proxiesData = data[2];
+		const provMap = providerMap(data[3]);
 
 		let m, s, o;
 
@@ -234,7 +253,7 @@ return view.extend({
 				statusBlock(running, uci.get('__PKG_NAME__', 'main', 'enabled') === '1'),
 				E('div', { 'class': 'cbi-section' }, [
 					E('h3', {}, _('Node')),
-					nodePicker(proxiesData)
+					nodePicker(proxiesData, provMap)
 				]),
 				mapNode
 			]);
