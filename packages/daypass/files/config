@@ -8,9 +8,14 @@ config __PKG_NAME__ 'main'
 	option mihomo_gz ''
 
 config settings 'settings'
-	option dns_type 'doh'
-	option dns_server 'https://1.1.1.1/dns-query'
+	option dns_type 'udp'
+	option dns_server '1.1.1.1'
 	option bootstrap_dns_server '1.1.1.1'
+	# Optional multi-resolver lists (override dns_server / bootstrap). Plain IPs
+	# are the most reliable; DoH (https://…) works but is slower to bootstrap.
+	#list nameservers '1.1.1.1'
+	#list nameservers '8.8.8.8'
+	#list proxy_server_nameservers '1.1.1.1'
 	list source_network_interfaces 'br-lan'
 	option update_interval '1d'
 	option disable_quic '0'
