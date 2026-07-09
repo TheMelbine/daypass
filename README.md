@@ -1,6 +1,6 @@
 # daypass
 
-Выборочный прозрачный прокси для OpenWrt на ядре [mihomo](https://github.com/MetaCubeX/mihomo). Через прокси идёт только выбранный трафик — домены или подсети из списков; остальное идёт напрямую, минуя mihomo.
+Прокси для OpenWrt на базе [mihomo](https://github.com/MetaCubeX/mihomo).
 
 ## Установка
 
