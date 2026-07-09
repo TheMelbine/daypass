@@ -77,10 +77,24 @@ check_system() {
 install_deps() {
 	msg "Updating package lists..."
 	pkg_update || die "package list update failed"
-	msg "Installing runtime dependencies from the official feed..."
-	# firewall4 is default on 24.10/25.12; the rest are the daypass runtime deps.
-	pkg_install_feed kmod-nft-tproxy ip-full ca-bundle curl jsonfilter \
-		ucode ucode-mod-fs ucode-mod-uci ucode-mod-ubus
+
+	# Install ONLY missing deps. Running `opkg install` on an already-present
+	# base package (curl, ucode, ...) pulls the newest feed build and upgrades
+	# it — a partial system upgrade that breaks ABI-coupled libraries (e.g. a new
+	# curl against an old libcurl, new ucode mods against an old libucode) and
+	# takes out LuCI. firewall4 is default on 24.10/25.12.
+	local dep missing=""
+	for dep in kmod-nft-tproxy ip-full ca-bundle curl jsonfilter \
+		ucode ucode-mod-fs ucode-mod-uci ucode-mod-ubus; do
+		pkg_installed "$dep" || missing="$missing $dep"
+	done
+	if [ -n "$missing" ]; then
+		msg "Installing missing dependencies:$missing"
+		# shellcheck disable=SC2086
+		pkg_install_feed $missing
+	else
+		msg "All runtime dependencies already present — nothing to install."
+	fi
 }
 
 # Download every release asset matching our packages for this arch.
