@@ -107,8 +107,19 @@ const methods = {
 			const query = req.args?.query ?? '';
 			const body = req.args?.body ?? '';
 			const secret = uci_get('main.api_secret');
-			const url = `http://${API}${path}`;
-			const raw = sh(`curl -s --max-time 10 --request '${method}' --oauth2-bearer '${secret}' --url-query '${query}' --data '${body}' '${url}' 2>/dev/null`);
+			// escape single quotes for safe single-quoted shell args
+			const q = (s) => replace('' + s, "'", "'\\''");
+			// query goes straight onto the URL (curl --url-query re-encodes and
+			// breaks nested URLs); --data is only sent when there is a body (an
+			// empty body makes some GET endpoints answer "Body invalid").
+			let url = `http://${API}${path}`;
+			if (query != '')
+				url += '?' + query;
+			let cmd = `curl -s --max-time 10 --request '${q(method)}' --oauth2-bearer '${q(secret)}'`;
+			if (body != '')
+				cmd += ` --data '${q(body)}'`;
+			cmd += ` '${q(url)}' 2>/dev/null`;
+			const raw = sh(cmd);
 			return parse_json(raw) ?? { raw: raw };
 		}
 	},
