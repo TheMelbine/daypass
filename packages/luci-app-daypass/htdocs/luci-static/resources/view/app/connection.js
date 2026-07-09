@@ -251,16 +251,24 @@ return view.extend({
 		});
 
 		return m.render().then(function (mapNode) {
+			/* insert the live node picker right after the Subscriptions section
+			 * (nodes come FROM the subscriptions, so they read below them). */
+			const nodeBlock = E('div', { 'class': 'cbi-section' }, [
+				E('h3', {}, _('Node')),
+				nodePicker(proxiesData, provMap)
+			]);
+			const secs = mapNode.querySelectorAll(':scope > .cbi-section');
+			if (secs.length)
+				secs[0].parentNode.insertBefore(nodeBlock, secs[0].nextSibling);
+			else
+				mapNode.appendChild(nodeBlock);
+
 			return E('div', { 'id': 'dp-conn' }, [
 				E('style', {}, '#dp-conn .cbi-dynlist .cbi-input-text,' +
 					'#dp-conn .cbi-value input.cbi-input-text{' +
 					'min-width:34em;max-width:100%;text-align:left}'),
 				E('h2', {}, '__BRAND_NAME__'),
 				statusBlock(running, uci.get('__PKG_NAME__', 'main', 'enabled') === '1'),
-				E('div', { 'class': 'cbi-section' }, [
-					E('h3', {}, _('Node')),
-					nodePicker(proxiesData, provMap)
-				]),
 				mapNode
 			]);
 		});
