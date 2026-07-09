@@ -130,12 +130,20 @@ uci.foreach(C.PKG_NAME, 'ruleset', (s) => {
 	let fmt = s.format || 'mrs';
 	let act = s.action || 'PROXY';
 
-	rule_providers[n] = {
-		type: 'http', behavior: beh, format: fmt,
-		url: s.url,
-		path: C.PROVIDERS_REL + '/rule/' + n + '.' + ruleset_ext(fmt),
-		interval: int(s.interval || '86400'),
-	};
+	if (s.file) {
+		// local file provider (e.g. a list managed by another tool on the box)
+		rule_providers[n] = { type: 'file', behavior: beh, format: fmt, path: s.file };
+	} else {
+		rule_providers[n] = {
+			type: 'http', behavior: beh, format: fmt,
+			url: s.url,
+			path: C.PROVIDERS_REL + '/rule/' + n + '.' + ruleset_ext(fmt),
+			interval: int(s.interval || '86400'),
+			// fetch directly — the proxy group isn't ready at startup, so pulling
+			// through it would fail and leave the rule-set empty.
+			proxy: 'DIRECT',
+		};
+	}
 
 	let rule = 'RULE-SET,' + n + ',' + act;
 	if (beh == 'ipcidr' && uci_bool(s.no_resolve)) rule += ',no-resolve';
@@ -204,6 +212,16 @@ let match_default = (routing_mode == 'full') ? 'DIRECT' : (default_group != null
 push(rules, 'MATCH,' + get('settings', 'match_action', match_default));
 
 // -------------------- DNS --------------------
+// Prefer plain-IP nameserver lists (reliable, no per-query TLS) over a single
+// DoH URL, which handshake-times-out under load at startup. Lists override the
+// single dns_server / bootstrap_dns_server for users who want several resolvers.
+let nameservers = uci_array(uci.get(C.PKG_NAME, 'settings', 'nameservers'));
+if (length(nameservers) == 0) nameservers = [ dns_server ];
+let proxy_ns = uci_array(uci.get(C.PKG_NAME, 'settings', 'proxy_server_nameservers'));
+if (length(proxy_ns) == 0) proxy_ns = [ bootstrap ];
+let default_ns = uci_array(uci.get(C.PKG_NAME, 'settings', 'default_nameservers'));
+if (length(default_ns) == 0) default_ns = [ bootstrap ];
+
 let dns = {
 	enable: true,
 	listen: C.DNS_ADDR + ':' + C.DNS_PORT,
@@ -213,9 +231,9 @@ let dns = {
 	'fake-ip-filter-mode': 'whitelist',
 	'fake-ip-filter': fakeip_filter,
 	'fake-ip-ttl': 1,
-	'default-nameserver': [ bootstrap ],
-	nameserver: [ dns_server ],
-	'proxy-server-nameserver': [ bootstrap ],
+	'default-nameserver': default_ns,
+	nameserver: nameservers,
+	'proxy-server-nameserver': proxy_ns,
 };
 
 // -------------------- sniffer --------------------
