@@ -1,59 +1,79 @@
 # daypass
 
-Selective transparent proxy for OpenWrt, built on the **mihomo** (Clash.Meta)
-core with an **external nftables TPROXY** layer. A spiritual alternative to
-[podkop](https://github.com/itdoginfo/podkop), but mihomo-only and TPROXY-only.
+Выборочный прозрачный прокси для OpenWrt на ядре [mihomo](https://github.com/MetaCubeX/mihomo) (Clash.Meta) с внешним слоем nftables TPROXY.
 
-Only traffic you deliberately select (by domain list or subnet) is routed
-through the proxy; everything else is routed directly by the kernel with zero
-overhead — mihomo never even sees it.
+Через прокси идёт только тот трафик, который ты выбрал сам: домены из списков или подсети. Остальное роутер маршрутизирует напрямую, и mihomo его даже не видит. Идея та же, что у [podkop](https://github.com/itdoginfo/podkop), но здесь только mihomo и только TPROXY, без sing-box и без TUN.
 
-## Why mihomo + TPROXY (and no TUN)
+## Как это работает
 
-- mihomo's `fake-ip-filter-mode: whitelist` hands out fake-ip answers **only**
-  for whitelisted domains, so the external nft layer marks and TPROXY-redirects
-  exactly the selected flows. Same selective-routing behaviour as podkop, but
-  the DNS whitelist and list auto-refresh come from the core itself.
-- TPROXY (not TUN) keeps unselected traffic entirely off the Go process, which
-  matters on routers with limited RAM.
-- mihomo brings a REST API + dashboards (zashboard / metacubexd) and
-  proxy-groups with url-test / fallback for free.
+mihomo в режиме `fake-ip-filter-mode: whitelist` отдаёт fake-ip только для доменов из твоих списков. Внешний слой nftables ловит эти fake-ip и заворачивает соответствующие соединения в TPROXY. Для списков-подсетей их CIDR попадают в тот же nft-набор, поэтому трафик к нужным IP тоже уходит в прокси. Всё, что ты не выбрал, обходит Go-процесс стороной, и на роутере с малым ОЗУ это заметно.
 
-See [`docs/CONTRACT.md`](docs/CONTRACT.md) for the exact data path, nft
-topology, marks, ports, UCI schema, and mihomo config shape.
+Rule-set в формате `.mrs` (например списки runetfreedom) daypass распаковывает в обычный CIDR-текст командой самого mihomo (`convert-ruleset ipcidr mrs`) и грузит в nft. Отдельные текстовые списки искать не нужно.
 
-## Branding
+Полная схема (путь трафика, топология nft, метки, порты, схема UCI, форма конфига mihomo) лежит в [`docs/CONTRACT.md`](docs/CONTRACT.md).
 
-The package name and every runtime path, identifier and user-visible string are
-build-time parameters, so the project can be rebuilt under a different name
-without touching source:
+## Возможности
 
-```
-make apk BRAND=daypass          # default
-make apk BRAND=<name>           # a <name>.mk supplied via BRAND_DIR
-```
+- Два режима маршрутизации: `selective` (только выбранное) и `full` (весь трафик LAN через прокси).
+- Подписки (proxy-providers) и одиночные ссылки `vless://`, `ss://`, `trojan://`, `hysteria2://`, `socks://`.
+- Свои rule-set: домены и подсети в форматах `mrs`, `yaml`, `text`. `.mrs` распаковывается в nft автоматически.
+- Ручной выбор ноды с реальным пингом в веб-интерфейсе.
+- DNS-whitelist через fake-ip и обновление списков по расписанию.
+- Веб-интерфейс LuCI: подключение, ноды, подписки, правила, настройки, диагностика, дашборд (zashboard или metacubexd).
 
-`branding/daypass.mk` holds the default values; `branding/brand.mk` does the
-substitution. Only `daypass` ships in this tree — other brands are supplied
-out-of-tree by pointing `BRAND_DIR` at a separate overlay. The package **name
-itself** is brand-driven (`/etc/config/<brand>`, `/etc/init.d/<brand>`, nft
-table `<brand>`, LuCI menu `<brand>`). See
-[`docs/CONTRACT.md`](docs/CONTRACT.md#branding).
+## Требования
 
-## Layout
+- OpenWrt 24.10. Проверено на `aarch64_cortex-a53` (Routerich AX3000, MediaTek Filogic). Другие арки должны работать, но я их не гонял.
+- mihomo ставится отдельным пакетом: в официальном фиде OpenWrt его нет. На роутерах с малой флешкой можно переиспользовать уже установленный бинарь через опцию `mihomo_gz`.
 
-```
-branding/          brand definitions + Brand/Subst make macro + logos
-packages/daypass/  OpenWrt package: mihomo + nft TPROXY, ucode config generator
-packages/luci-app-daypass/LuCI web UI (standard form.Map pages) + rpcd plugin
-fe-app/            TypeScript/tsup source for the LuCI bundle (committed main.js)
-docker/            SDK images + build Dockerfiles (apk 25.12, ipk 24.10)
-scripts/           build.sh (docker wrapper) + verify-pkg.sh (artifact checks)
-tests/             smoke suite (shipped in-package as `<brand> selftest`) + QEMU
-docs/CONTRACT.md   the single source of truth for all cross-package conventions
+## Установка
+
+На роутере:
+
+```sh
+sh <(wget -qO- https://raw.githubusercontent.com/TheMelbine/daypass/master/install.sh)
 ```
 
-## Status
+Скрипт берёт последний релиз (mihomo, daypass, luci-app-daypass под арку роутера) и ставит его.
 
-Early scaffold. The core generator, nft template and proxy-URL parser are the
-substance; the LuCI forms and fe-app dashboard grow from a working skeleton.
+## С чего начать
+
+1. LuCI → Services → Daypass → **Connection**: вставь подписку или ссылку на ноду.
+2. **Proxies**: нажми Test и выбери ноду по пингу.
+3. **Rules** и **Settings**: списки доменов и подсетей, режим маршрутизации, DNS.
+
+## Сборка из исходников
+
+Нужен Docker.
+
+```sh
+make ipk                  # собрать .ipk (или make apk)
+make ipk BRAND=<name>     # своя марка через branding/<name>.mk
+```
+
+Артефакты складываются в `out/`. Релизы собирает CI и прикрепляет к GitHub Release.
+
+## Структура
+
+```
+branding/                  описания марок, макрос Brand/Subst, логотипы
+packages/daypass/          пакет OpenWrt: mihomo + nft TPROXY, генератор конфига на ucode
+packages/luci-app-daypass/ веб-интерфейс LuCI + rpcd-плагин
+fe-app/                    исходники LuCI-бандла на TypeScript (tsup), main.js закоммичен
+docker/                    Dockerfile для сборки в SDK
+docs/CONTRACT.md           единый источник правды по всем соглашениям между пакетами
+```
+
+## Брендинг
+
+Имя пакета и все пути, идентификаторы и видимые строки заданы параметрами сборки. Проект пересобирается под другим именем без правки исходников: меняются `/etc/config/<brand>`, `/etc/init.d/<brand>`, таблица nft `<brand>`, пункт меню LuCI. По умолчанию `daypass` (см. `branding/daypass.mk`).
+
+## Благодарности
+
+- [podkop](https://github.com/itdoginfo/podkop) — модель установщика и общий подход к выборочной маршрутизации.
+- [mihomo](https://github.com/MetaCubeX/mihomo) — ядро прокси.
+- Списки блокировок: [itdoginfo/allow-domains](https://github.com/itdoginfo/allow-domains), [runetfreedom](https://github.com/runetfreedom).
+
+## Лицензия
+
+GPL-3.0-or-later. См. [`LICENSE`](LICENSE).
