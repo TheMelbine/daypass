@@ -236,10 +236,8 @@ return view.extend({
 		o.value('fallback', _('Fallback (first alive)'));
 		o.default = 'select';
 
-		o = s.option(form.TextValue, 'proxy_string', _('Proxy link'),
+		o = s.option(form.DynamicList, 'links', _('Proxy link'),
 			_('A single vless:// ss:// trojan:// hysteria2:// (hy2://) or socks:// link.'));
-		o.rows = 2;
-		o.wrap = 'off';
 		o.optional = true;
 		o.validate = function (section_id, value) {
 			if (!value) return true;
