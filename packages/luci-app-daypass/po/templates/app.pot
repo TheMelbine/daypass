@@ -61,6 +61,9 @@ msgstr ""
 msgid "Block QUIC (UDP/443) so browsers fall back to TCP/TLS for more reliable sniffing."
 msgstr ""
 
+msgid "Block ads"
+msgstr ""
+
 msgid "Bootstrap DNS server"
 msgstr ""
 
@@ -325,10 +328,16 @@ msgstr ""
 msgid "Proxy-server nameservers"
 msgstr ""
 
+msgid "Quick switches for the built-in lists. Fine-tune the raw providers below."
+msgstr ""
+
 msgid "Raw mihomo rule lines applied after the generated rules, before the final MATCH."
 msgstr ""
 
 msgid "Raw mihomo rule lines evaluated first. e.g. %s or %s"
+msgstr ""
+
+msgid "Ready-made lists"
 msgstr ""
 
 msgid "Refresh"
@@ -397,9 +406,6 @@ msgstr ""
 msgid "Selective: only listed domains/subnets reach mihomo (efficient). Full: all LAN traffic is tproxied to mihomo, so every rule (incl. ipcidr) applies and unmatched traffic goes DIRECT."
 msgstr ""
 
-msgid "Service"
-msgstr ""
-
 msgid "Service running"
 msgstr ""
 
@@ -440,9 +446,6 @@ msgid "Some providers gate content on the client User-Agent."
 msgstr ""
 
 msgid "Start"
-msgstr ""
-
-msgid "Start %s automatically and route selected traffic through the proxy."
 msgstr ""
 
 msgid "Status"
@@ -503,6 +506,9 @@ msgid "URL"
 msgstr ""
 
 msgid "URL test (auto fastest)"
+msgstr ""
+
+msgid "Unblock RU-restricted resources"
 msgstr ""
 
 msgid "Update interval (s)"
