@@ -118,25 +118,30 @@ function control(action) {
 	});
 }
 
-function statusBlock(running) {
+function statusBlock(running, enabledBoot) {
 	function btn(style, label, action) {
 		const b = E('button', { 'class': 'cbi-button cbi-button-' + style, 'style': 'margin-right:.4em' }, label);
 		b.addEventListener('click', function () { control(action); });
 		return b;
 	}
-	return E('div', { 'class': 'cbi-section', 'style': 'margin-bottom:1em' }, [
-		E('div', { 'style': 'display:flex;align-items:center;gap:1em;flex-wrap:wrap' }, [
-			E('span', {}, [
-				_('Status') + ': ',
-				E('span', { 'id': 'svc_status', 'style': 'font-weight:bold;color:' + (running ? '#2e7d32' : '#c0392b') },
-					running ? _('Running') : _('Stopped'))
-			]),
-			E('span', {}, [
-				btn('positive', _('Start'), 'start'),
-				btn('negative', _('Stop'), 'stop'),
-				btn('action', _('Restart'), 'restart')
-			])
-		])
+	const chk = E('input', { 'type': 'checkbox', 'style': 'margin:0 .35em 0 0' });
+	chk.checked = enabledBoot;
+	/* just marks the uci change dirty; the form's Save & Apply flushes it */
+	chk.addEventListener('change', function () {
+		uci.set('__PKG_NAME__', 'main', 'enabled', this.checked ? '1' : '0');
+	});
+	return E('div', { 'style': 'display:flex;align-items:center;gap:1.5em;flex-wrap:wrap;margin-bottom:1em' }, [
+		E('span', {}, [
+			_('Status') + ': ',
+			E('span', { 'id': 'svc_status', 'style': 'font-weight:bold;color:' + (running ? '#2e7d32' : '#c0392b') },
+				running ? _('Running') : _('Stopped'))
+		]),
+		E('span', {}, [
+			btn('positive', _('Start'), 'start'),
+			btn('negative', _('Stop'), 'stop'),
+			btn('action', _('Restart'), 'restart')
+		]),
+		E('label', { 'style': 'display:inline-flex;align-items:center;cursor:pointer' }, [ chk, _('Enable at boot') ])
 	]);
 }
 
@@ -156,14 +161,6 @@ return view.extend({
 		let m, s, o;
 
 		m = new form.Map('__PKG_NAME__', '__BRAND_NAME__');
-
-		/* enable at boot (status/control live above the form) */
-		s = m.section(form.TypedSection, '__PKG_NAME__', _('Service'));
-		s.anonymous = true;
-		s.addremove = false;
-		o = s.option(form.Flag, 'enabled', _('Enable at boot'),
-			_('Start %s automatically and route selected traffic through the proxy.').format('__BRAND_NAME__'));
-		o.rmempty = false;
 
 		/* subscriptions (add a URL — that's the whole setup) */
 		s = m.section(form.GridSection, 'subscription', _('Subscriptions'),
@@ -201,16 +198,13 @@ return view.extend({
 		o.placeholder = '300';
 		o.modalonly = true;
 
-		/* connection method (the proxy group) — kept minimal; a group with no
-		 * explicit members draws from every subscription automatically. */
-		s = m.section(form.TypedSection, 'proxy', _('Connection method'),
+		/* connection method (the single proxy group) — a group with no explicit
+		 * members draws from every subscription automatically. */
+		const pg = uci.sections('__PKG_NAME__', 'proxy')[0];
+		const pgName = pg ? pg['.name'] : 'PROXY';
+		s = m.section(form.NamedSection, pgName, 'proxy', _('Connection method'),
 			_('A single link is optional — with subscriptions above you can leave it empty.'));
-		s.anonymous = false;
-		s.addremove = true;
-
-		o = s.option(form.Flag, 'enabled', _('Enabled'));
-		o.rmempty = false;
-		o.editable = true;
+		s.addremove = false;
 
 		o = s.option(form.ListValue, 'type', _('Group type'));
 		o.value('select', _('Select (manual pick)'));
@@ -236,7 +230,7 @@ return view.extend({
 
 		return m.render().then(function (mapNode) {
 			return E('div', {}, [
-				statusBlock(running),
+				statusBlock(running, uci.get('__PKG_NAME__', 'main', 'enabled') === '1'),
 				E('div', { 'class': 'cbi-section' }, [
 					E('h3', {}, _('Node')),
 					nodePicker(proxiesData)
