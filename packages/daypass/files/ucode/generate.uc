@@ -104,7 +104,10 @@ uci.foreach(C.PKG_NAME, 'proxy', (s) => {
 		});
 	}
 
-	if (length(members) == 0 && length(uses) == 0) return;
+	// Nothing configured yet (no subscription, no link): keep the group valid so
+	// rules that reference it (e.g. shipped defaults routing to PROXY) don't
+	// break the config. Traffic goes DIRECT until a subscription is added.
+	if (length(members) == 0 && length(uses) == 0) push(members, 'DIRECT');
 
 	let t = s.type || 'select';
 	let g = { name: id };
