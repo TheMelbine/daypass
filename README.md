@@ -10,7 +10,7 @@ sh <(wget -qO- https://raw.githubusercontent.com/TheMelbine/daypass/master/insta
 
 OpenWrt 24.10, `aarch64_cortex-a53` (проверено на Routerich AX3000). Ставит mihomo, daypass и веб-интерфейс под арку роутера.
 
-Дальше: **LuCI → Services → Daypass → Connection** — вставь подписку или ссылку на ноду. На вкладке **Proxies** жми Test и выбирай ноду по пингу.
+Дальше: **LuCI → Службы → Daypass → Подключение** — вставь подписку или ссылку на ноду. На вкладке **Прокси** жми **Тест** и выбирай ноду по пингу.
 
 ## Возможности
 
