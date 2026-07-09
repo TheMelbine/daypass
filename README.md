@@ -8,7 +8,7 @@
 sh <(wget -O - https://raw.githubusercontent.com/TheMelbine/daypass/master/install.sh)
 ```
 
-Нужен OpenWrt 24.10 (проверено на Routerich AX3000, `aarch64_cortex-a53`).
+Протестировано на OpenWrt 24.10, Routerich AX3000 (`aarch64_cortex-a53`).
 
 Дальше: **LuCI → Службы → Daypass → Подключение** — вставь подписку или ссылку на ноду. На вкладке **Прокси** жми **Тест** и выбирай ноду по пингу.
 
