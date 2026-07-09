@@ -93,6 +93,16 @@ uci.foreach(C.PKG_NAME, 'proxy', (s) => {
 	// subscriptions this group draws from
 	let uses = uci_array(s.subscriptions);
 
+	// Zero-config default: a group with no explicit members and no chosen
+	// subscriptions draws from every enabled subscription. Lets the UI just
+	// add a subscription without wiring it to a group by hand.
+	if (length(members) == 0 && length(uses) == 0) {
+		uci.foreach(C.PKG_NAME, 'subscription', (sub) => {
+			if (sub.enabled == null || uci_bool(sub.enabled))
+				push(uses, sub['.name']);
+		});
+	}
+
 	if (length(members) == 0 && length(uses) == 0) return;
 
 	let t = s.type || 'select';

@@ -2,13 +2,32 @@
 'require view';
 'require form';
 'require uci';
+'require tools.__PKG_NAME__ as api';
+
+/* Static fallback if the rpcd luci.__PKG_NAME__ lists() catalog is unavailable. */
+const FALLBACK_LISTS = [
+	{ tag: 'russia_inside',  label: 'Russia (inside)' },
+	{ tag: 'russia_outside', label: 'Russia (outside)' },
+	{ tag: 'youtube',        label: 'YouTube' },
+	{ tag: 'telegram',       label: 'Telegram' },
+	{ tag: 'discord',        label: 'Discord' },
+	{ tag: 'meta',           label: 'Meta' },
+	{ tag: 'twitter',        label: 'Twitter / X' }
+];
 
 return view.extend({
 	load: function () {
-		return uci.load('__PKG_NAME__');
+		return Promise.all([
+			uci.load('__PKG_NAME__'),
+			L.resolveDefault(api.lists(), null)
+		]);
 	},
 
-	render: function () {
+	render: function (data) {
+		const catalog = (data[1] && Array.isArray(data[1].lists) && data[1].lists.length)
+			? data[1].lists
+			: FALLBACK_LISTS;
+
 		let m, s, o;
 
 		m = new form.Map('__PKG_NAME__',
@@ -33,6 +52,46 @@ return view.extend({
 
 		o = s.option(form.DynamicList, 'append_rules', _('Rules — after'),
 			_('Raw mihomo rule lines applied after the generated rules, before the final MATCH.'));
+
+		/* ---------------- route buckets (which lists via which proxy) ---------------- */
+		s = m.section(form.TypedSection, 'route', _('Lists to route'),
+			_('Pick the community lists (and any custom domains/subnets) that should travel through a proxy.'));
+		s.anonymous = false;
+		s.addremove = true;
+
+		o = s.option(form.Flag, 'enabled', _('Enabled'));
+		o.rmempty = false;
+
+		o = s.option(form.ListValue, 'proxy', _('Proxy'),
+			_('Which proxy group this bucket routes through.'));
+		const proxies = uci.sections('__PKG_NAME__', 'proxy');
+		if (proxies.length)
+			proxies.forEach(function (px) { o.value(px['.name'], px['.name']); });
+		else
+			o.value('main', 'main');
+
+		o = s.option(form.MultiValue, 'community_lists', _('Community lists'),
+			_('Domains and subnets in the selected lists are routed through the proxy.'));
+		o.display_size = 12;
+		catalog.forEach(function (item) { o.value(item.tag, item.label || item.tag); });
+		o.load = function (section_id) {
+			return uci.get('__PKG_NAME__', section_id, 'community_lists') || [];
+		};
+		o.write = function (section_id, value) {
+			uci.set('__PKG_NAME__', section_id, 'community_lists', L.toArray(value));
+		};
+		o.remove = function (section_id) {
+			uci.unset('__PKG_NAME__', section_id, 'community_lists');
+		};
+
+		o = s.option(form.DynamicList, 'user_domains', _('Custom domains'),
+			_('Extra domains to route through the proxy.'));
+		o.optional = true;
+
+		o = s.option(form.DynamicList, 'user_subnets', _('Custom subnets'),
+			_('Extra CIDR subnets to route through the proxy.'));
+		o.datatype = 'cidr4';
+		o.optional = true;
 
 		/* ---------------- custom rule-providers ---------------- */
 		s = m.section(form.GridSection, 'ruleset', _('Custom rule-sets'),
@@ -62,9 +121,7 @@ return view.extend({
 			_('PROXY, DIRECT, REJECT or a proxy group name.'));
 		o.default = 'PROXY';
 		o.rmempty = false;
-		uci.sections('__PKG_NAME__', 'proxy').forEach(function (px) {
-			o.value(px['.name'], px['.name']);
-		});
+		uci.sections('__PKG_NAME__', 'proxy').forEach(function (px) { o.value(px['.name'], px['.name']); });
 		o.value('DIRECT', 'DIRECT');
 		o.value('REJECT', 'REJECT');
 
