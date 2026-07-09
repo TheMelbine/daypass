@@ -25,43 +25,51 @@ config settings 'settings'
 	# full: all LAN traffic is tproxied to mihomo, so every rule (incl. ipcidr)
 	# applies and MATCH defaults to DIRECT. Use 'full' for rich custom rule sets.
 	option routing_mode 'selective'
-	# Raw mihomo rule lines. prepend_rules run FIRST (DIRECT/REJECT exceptions,
-	# private-IP bypasses); append_rules run after generated rules, before MATCH.
-	#list prepend_rules 'AND,((NETWORK,udp),(DST-PORT,443)),REJECT'
-	#list prepend_rules 'IP-CIDR,10.0.0.0/8,DIRECT,no-resolve'
-	#list prepend_rules 'IP-CIDR,192.168.0.0/16,DIRECT,no-resolve'
+	# Sensible defaults: drop QUIC so browsers fall back to TCP/TLS, and never
+	# proxy local / private / CGNAT ranges (matters in full mode).
+	list prepend_rules 'AND,((NETWORK,udp),(DST-PORT,443)),REJECT'
+	list prepend_rules 'IP-CIDR,10.0.0.0/8,DIRECT,no-resolve'
+	list prepend_rules 'IP-CIDR,172.16.0.0/12,DIRECT,no-resolve'
+	list prepend_rules 'IP-CIDR,192.168.0.0/16,DIRECT,no-resolve'
+	list prepend_rules 'IP-CIDR,127.0.0.0/8,DIRECT,no-resolve'
+	list prepend_rules 'IP-CIDR,169.254.0.0/16,DIRECT,no-resolve'
+	list prepend_rules 'IP-CIDR,224.0.0.0/4,DIRECT,no-resolve'
+	list prepend_rules 'IP-CIDR,100.64.0.0/10,DIRECT,no-resolve'
 
-# Subscription (mihomo proxy-provider). mihomo fetches + health-checks it.
-#config subscription 'lagom'
+# The proxy group. With no subscription/link yet it stays DIRECT; add a
+# subscription on the Connection page and every node is drawn in automatically.
+config proxy 'PROXY'
+	option enabled '1'
+	option type 'select'
+
+# Subscription (mihomo proxy-provider) — add yours on the Connection page:
+#config subscription 'my_sub'
 #	option enabled '1'
 #	option url 'https://example.com/sub'
-#	option interval '3600'
-#	option user_agent 'clash.meta'
-#	option health_check_url 'https://www.gstatic.com/generate_204'
-#	option health_check_interval '300'
 
-# Proxy group. Members come from: proxy_string (one URL), links (many URLs),
-# outbound_json (raw mihomo proxy), and/or subscriptions (proxy-providers).
-config proxy 'PROXY'
-	option enabled '0'
-	option type 'select'
-	option proxy_string ''
-	#list links 'vless://...'
-	#list subscriptions 'lagom'
-	#option include_direct '1'
+# --- shipped rule-sets: block ads, route RU-blocked resources through PROXY ---
 
-# Custom rule-provider. behavior: domain|ipcidr|classical; format: mrs|yaml|text;
-# action: PROXY|DIRECT|REJECT or a proxy group name.
-#config ruleset 'ads'
-#	option enabled '1'
-#	option url 'https://example.com/ads.mrs'
-#	option behavior 'domain'
-#	option format 'mrs'
-#	option action 'REJECT'
-#	option interval '86400'
+config ruleset 'ads'
+	option enabled '1'
+	option behavior 'domain'
+	option format 'mrs'
+	option action 'REJECT'
+	option url 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/category-ads-all.mrs'
+	option interval '86400'
 
-# Routing bucket for community lists / inline domains -> a proxy group.
-config route 'route'
-	option enabled '0'
-	option proxy 'PROXY'
-	list community_lists 'russia_inside'
+config ruleset 'ru_blocked_domains'
+	option enabled '1'
+	option behavior 'domain'
+	option format 'mrs'
+	option action 'PROXY'
+	option url 'https://github.com/frayZV/runetfreedom-mrs/releases/latest/download/ru-blocked-all.mrs'
+	option interval '86400'
+
+config ruleset 'ru_blocked_ips'
+	option enabled '1'
+	option behavior 'ipcidr'
+	option format 'mrs'
+	option action 'PROXY'
+	option no_resolve '1'
+	option url 'https://raw.githubusercontent.com/runetfreedom/russia-blocked-geoip/release/mrs/re-filter.mrs'
+	option interval '86400'
