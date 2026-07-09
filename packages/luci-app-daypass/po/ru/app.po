@@ -10,122 +10,113 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-msgid "Selective transparent proxy. Paste a proxy link and choose which lists route through it; everything else is routed directly by the kernel."
-msgstr "Выборочный прозрачный прокси. Вставьте ссылку на прокси и выберите, какие списки направлять через него; остальной трафик маршрутизируется ядром напрямую."
+msgid "%s — Diagnostics"
+msgstr "%s — Диагностика"
 
-msgid "Service"
-msgstr "Служба"
+msgid "%s — Proxies"
+msgstr "%s — Прокси"
 
-msgid "Enable at boot"
-msgstr "Включать при загрузке"
-
-msgid "Start %s automatically and route selected traffic through the proxy."
-msgstr "Автоматически запускать %s и направлять выбранный трафик через прокси."
-
-msgid "Status"
-msgstr "Состояние"
-
-msgid "Running"
-msgstr "Работает"
-
-msgid "Stopped"
-msgstr "Остановлен"
-
-msgid "Control"
-msgstr "Управление"
-
-msgid "Start"
-msgstr "Запустить"
-
-msgid "Stop"
-msgstr "Остановить"
-
-msgid "Restart"
-msgstr "Перезапустить"
-
-msgid "Proxy"
-msgstr "Прокси"
-
-msgid "One outbound group. Paste a single connection link, list several for auto-selection, or supply raw outbound JSON."
-msgstr "Одна исходящая группа. Вставьте одну ссылку, укажите несколько для авто-выбора или задайте исходящий JSON."
-
-msgid "Enabled"
-msgstr "Включено"
-
-msgid "Type"
-msgstr "Тип"
-
-msgid "Single link"
-msgstr "Одна ссылка"
-
-msgid "Selector (manual pick)"
-msgstr "Селектор (ручной выбор)"
-
-msgid "URL test (auto fastest)"
-msgstr "URL-тест (авто-выбор быстрейшего)"
-
-msgid "Raw outbound JSON"
-msgstr "Исходящий JSON"
-
-msgid "Proxy link"
-msgstr "Ссылка на прокси"
-
-msgid "vless:// ss:// trojan:// hysteria2:// (hy2://) or socks:// link."
-msgstr "Ссылка vless:// ss:// trojan:// hysteria2:// (hy2://) или socks://."
-
-msgid "Invalid proxy link"
-msgstr "Некорректная ссылка на прокси"
-
-msgid "Proxy links"
-msgstr "Ссылки на прокси"
-
-msgid "One connection link per entry for selector / url-test groups."
-msgstr "По одной ссылке на строку для групп selector / url-test."
-
-msgid "Outbound JSON"
-msgstr "Исходящий JSON"
-
-msgid "Test URL"
-msgstr "URL для проверки"
-
-msgid "Routing"
-msgstr "Маршрутизация"
-
-msgid "One routing bucket: pick the community lists (and any custom domains/subnets) that should travel through a proxy."
-msgstr "Один набор маршрутизации: выберите списки сообщества (и свои домены/подсети), которые должны идти через прокси."
-
-msgid "Which proxy group this bucket routes through."
-msgstr "Через какую группу прокси идёт этот набор."
-
-msgid "Community lists"
-msgstr "Списки сообщества"
-
-msgid "Domains and subnets in the selected lists are routed through the proxy."
-msgstr "Домены и подсети из выбранных списков направляются через прокси."
-
-msgid "Custom domains"
-msgstr "Свои домены"
-
-msgid "Custom subnets"
-msgstr "Свои подсети"
+msgid "%s — Rules"
+msgstr "%s — Правила"
 
 msgid "%s — Settings"
 msgstr "%s — Настройки"
 
-msgid "Settings"
-msgstr "Настройки"
+msgid "%s — Subscriptions"
+msgstr "%s — Подписки"
+
+msgid "%s → %s"
+msgstr "%s → %s"
+
+msgid "(log empty)"
+msgstr "(журнал пуст)"
+
+msgid "(no output)"
+msgstr "(нет вывода)"
+
+msgid "A proxy group. Its members can be a single link, several links, subscriptions, and/or raw outbound JSON — combine as needed."
+msgstr "Группа прокси. В неё можно включить одиночную ссылку, несколько ссылок, подписки и/или сырой outbound-JSON — в любом сочетании."
+
+msgid "A single vless:// ss:// trojan:// hysteria2:// (hy2://) or socks:// link."
+msgstr "Одна ссылка vless:// ss:// trojan:// hysteria2:// (hy2://) или socks://."
+
+msgid "API secret"
+msgstr "Секрет API"
+
+msgid "Absolute path to a local rule file (alternative to URL)."
+msgstr "Абсолютный путь к локальному файлу правил (вместо URL)."
+
+msgid "Action"
+msgstr "Действие"
+
+msgid "Add a DIRECT entry to the group (useful as a manual bypass option)."
+msgstr "Добавить в группу пункт DIRECT (удобно как ручной обход)."
+
+msgid "Advanced"
+msgstr "Дополнительно"
+
+msgid "App"
+msgstr "Приложение"
+
+msgid "Bearer token for the mihomo REST API (127.0.0.1:9090). Auto-generated on first boot."
+msgstr "Bearer-токен для REST API mihomo (127.0.0.1:9090). Генерируется при первом запуске."
+
+msgid "Behavior"
+msgstr "Поведение"
+
+msgid "Block QUIC (UDP/443) so browsers fall back to TCP/TLS for more reliable sniffing."
+msgstr "Блокировать QUIC (UDP/443), чтобы браузеры откатывались на TCP/TLS — так надёжнее распознавание трафика."
+
+msgid "Bootstrap DNS server"
+msgstr "Начальный DNS-сервер"
+
+msgid "Bundled clash dashboard served by mihomo external-ui."
+msgstr "Встроенный clash-дашборд, отдаётся через external-ui mihomo."
+
+msgid "Checking service status…"
+msgstr "Проверка состояния службы…"
+
+msgid "Checks"
+msgstr "Проверки"
+
+msgid "Clash/mihomo subscription (proxy-provider) link."
+msgstr "Ссылка на подписку Clash/mihomo (proxy-provider)."
+
+msgid "Community lists"
+msgstr "Списки сообщества"
+
+msgid "Config"
+msgstr "Конфигурация"
+
+msgid "Connection"
+msgstr "Подключение"
+
+msgid "Core (mihomo)"
+msgstr "Ядро (mihomo)"
+
+msgid "Core log"
+msgstr "Журнал ядра"
+
+msgid "Core, DNS, network and list settings. Defaults are safe; change only what you need."
+msgstr "Ядро, DNS, сеть и списки. Значения по умолчанию безопасны — меняй только нужное."
+
+msgid "Custom domains"
+msgstr "Свои домены"
+
+msgid "Custom rule-sets"
+msgstr "Свои rule-set"
+
+msgid "Custom subnets"
+msgstr "Свои подсети"
 
 msgid "DNS"
 msgstr "DNS"
 
-msgid "Network"
-msgstr "Сеть"
+msgid "DNS over HTTPS (DoH)"
+msgstr "DNS over HTTPS (DoH)"
 
-msgid "Lists"
-msgstr "Списки"
-
-msgid "Advanced"
-msgstr "Дополнительно"
+msgid "DNS over TLS (DoT)"
+msgstr "DNS over TLS (DoT)"
 
 msgid "DNS protocol"
 msgstr "Протокол DNS"
@@ -133,29 +124,17 @@ msgstr "Протокол DNS"
 msgid "DNS server"
 msgstr "DNS-сервер"
 
-msgid "Bootstrap DNS server"
-msgstr "Начальный DNS-сервер"
-
-msgid "LAN interfaces"
-msgstr "LAN-интерфейсы"
-
-msgid "List update interval"
-msgstr "Интервал обновления списков"
-
-msgid "Every hour"
-msgstr "Каждый час"
-
 msgid "Daily"
 msgstr "Ежедневно"
 
-msgid "Log level"
-msgstr "Уровень журнала"
-
-msgid "API secret"
-msgstr "Секрет API"
-
 msgid "Dashboard"
 msgstr "Панель"
+
+msgid "Debug"
+msgstr "Отладка"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
 
 msgid "Disable QUIC"
 msgstr "Отключить QUIC"
@@ -163,44 +142,464 @@ msgstr "Отключить QUIC"
 msgid "Do not modify DHCP/DNS"
 msgstr "Не изменять DHCP/DNS"
 
-msgid "%s — Diagnostics"
-msgstr "%s — Диагностика"
+msgid "Documentation"
+msgstr "Документация"
 
-msgid "Version"
-msgstr "Версия"
+msgid "Domains and subnets in the selected lists are routed through the proxy."
+msgstr "Домены и подсети из выбранных списков направляются через прокси."
 
-msgid "App"
-msgstr "Приложение"
+msgid "Enable at boot"
+msgstr "Включать при загрузке"
 
-msgid "Core (mihomo)"
-msgstr "Ядро (mihomo)"
+msgid "Enabled"
+msgstr "Включено"
 
-msgid "Checks"
-msgstr "Проверки"
+msgid "Error"
+msgstr "Ошибка"
 
-msgid "Config"
-msgstr "Конфигурация"
+msgid "Every 12 hours"
+msgstr "Каждые 12 часов"
 
-msgid "nftables"
-msgstr "nftables"
+msgid "Every 3 days"
+msgstr "Каждые 3 дня"
 
-msgid "Core log"
-msgstr "Журнал ядра"
+msgid "Every 3 hours"
+msgstr "Каждые 3 часа"
+
+msgid "Every hour"
+msgstr "Каждый час"
+
+msgid "External (URL) or local (file) rule providers, each routed to an action."
+msgstr "Внешние (URL) или локальные (файл) провайдеры правил, каждый со своим действием."
+
+msgid "Extra CIDR subnets to route through the proxy."
+msgstr "Дополнительные подсети (CIDR) для маршрутизации через прокси."
+
+msgid "Extra domains to route through the proxy."
+msgstr "Дополнительные домены для маршрутизации через прокси."
+
+msgid "Failed to resolve the dashboard address"
+msgstr "Не удалось определить адрес дашборда"
+
+msgid "Failed to switch %s"
+msgstr "Не удалось переключить %s"
+
+msgid "Fallback (first alive)"
+msgstr "Fallback (первый живой)"
+
+msgid "For ipcidr rules: match on the destination IP without a DNS lookup."
+msgstr "Для правил ipcidr: сопоставлять по IP назначения без DNS-запроса."
+
+msgid "Format"
+msgstr "Формат"
+
+msgid "Full (all traffic via mihomo)"
+msgstr "Full (весь трафик через mihomo)"
+
+msgid "Group"
+msgstr "Группа"
+
+msgid "Group type"
+msgstr "Тип группы"
+
+msgid "Gzipped mihomo path"
+msgstr "Путь к сжатому mihomo (gzip)"
+
+msgid "Health-check URL"
+msgstr "URL проверки доступности"
+
+msgid "Health-check URL for url-test / fallback groups."
+msgstr "URL проверки доступности для групп url-test / fallback."
+
+msgid "Health-check interval (s)"
+msgstr "Интервал проверки (с)"
+
+msgid "How often mihomo refreshes the subscription."
+msgstr "Как часто mihomo обновляет подписку."
+
+msgid "How often subnet lists are refreshed into the nft set."
+msgstr "Как часто списки подсетей обновляются в nft-наборе."
+
+msgid "Hysteria2 URL has an invalid port"
+msgstr "Некорректный порт в Hysteria2 URL"
+
+msgid "Hysteria2 URL has an unsupported obfs type"
+msgstr "Неподдерживаемый тип obfs в Hysteria2 URL"
+
+msgid "Hysteria2 URL is missing the password"
+msgstr "В Hysteria2 URL отсутствует пароль"
+
+msgid "Hysteria2 URL is missing the password@server separator"
+msgstr "В Hysteria2 URL нет разделителя password@server"
+
+msgid "Hysteria2 URL is missing the port"
+msgstr "В Hysteria2 URL отсутствует порт"
+
+msgid "Hysteria2 URL is missing the server host"
+msgstr "В Hysteria2 URL отсутствует хост сервера"
+
+msgid "Hysteria2 URL must not contain whitespace"
+msgstr "Hysteria2 URL не должен содержать пробелов"
+
+msgid "Hysteria2 URL must start with hysteria2:// or hy2://"
+msgstr "Hysteria2 URL должен начинаться с hysteria2:// или hy2://"
+
+msgid "Include DIRECT"
+msgstr "Добавить DIRECT"
+
+msgid "Info"
+msgstr "Инфо"
+
+msgid "Invalid proxy link"
+msgstr "Некорректная ссылка на прокси"
+
+msgid "LAN interfaces"
+msgstr "LAN-интерфейсы"
+
+msgid "Latency"
+msgstr "Задержка"
+
+msgid "List update interval"
+msgstr "Интервал обновления списков"
+
+msgid "Lists"
+msgstr "Списки"
+
+msgid "Live proxy dashboard."
+msgstr "Живая панель прокси."
+
+msgid "Local file"
+msgstr "Локальный файл"
+
+msgid "Log level"
+msgstr "Уровень журнала"
+
+msgid "Monitor proxies, traffic and connections in the mihomo web dashboard."
+msgstr "Мониторинг прокси, трафика и соединений в веб-дашборде mihomo."
+
+msgid "Must be an http(s) URL"
+msgstr "Должен быть http(s) URL"
+
+msgid "Nameservers"
+msgstr "DNS-серверы"
+
+msgid "Network"
+msgstr "Сеть"
+
+msgid "No proxy groups found. Is the service running and are subscriptions loaded?"
+msgstr "Группы прокси не найдены. Служба запущена и подписки загружены?"
+
+msgid "Node"
+msgstr "Нода"
+
+msgid "One connection link per entry."
+msgstr "По одной ссылке в строке."
+
+msgid "One routing bucket: pick the community lists (and any custom domains/subnets) that should travel through a proxy."
+msgstr "Один набор маршрутизации: выберите списки сообщества (и свои домены/подсети), которые должны идти через прокси."
+
+msgid "Open dashboard"
+msgstr "Открыть дашборд"
+
+msgid "Outbound JSON"
+msgstr "Исходящий JSON"
+
+msgid "PROXY, DIRECT, REJECT or a proxy group name."
+msgstr "PROXY, DIRECT, REJECT или имя группы прокси."
+
+msgid "Path to a gzipped mihomo binary to unpack to tmpfs when /usr/bin/mihomo is absent (small-flash routers). Empty uses the shipped default."
+msgstr "Путь к сжатому (gzip) бинарю mihomo, который распаковывается в tmpfs, когда /usr/bin/mihomo отсутствует (роутеры с малой флешкой). Пусто — использовать встроенный по умолчанию."
+
+msgid "Pick a check above."
+msgstr "Выбери проверку выше."
+
+msgid "Pick which node each Select group uses. Auto-select groups (URL-test / Fallback) are read-only. Selection is live and persists across restarts. Use Test to measure per-node latency."
+msgstr "Выбери ноду для каждой группы Select. Группы с автовыбором (URL-test / Fallback) только для чтения. Выбор применяется сразу и сохраняется между перезапусками. Кнопка Test измеряет задержку по каждой ноде."
+
+msgid "Plain IP (recommended) or a DoH/DoT URL. Used when the Nameservers list is empty."
+msgstr "Обычный IP (рекомендуется) или DoH/DoT URL. Используется, когда список DNS-серверов пуст."
+
+msgid "Plain-IP resolver used to look up DoH/DoT server hostnames."
+msgstr "Резолвер по обычному IP для разрешения имён DoH/DoT-серверов."
+
+msgid "Protocol for the single DNS server below. For several resolvers use the Nameservers list instead."
+msgstr "Протокол для одиночного DNS-сервера ниже. Для нескольких резолверов используй список DNS-серверов."
+
+msgid "Proxies"
+msgstr "Прокси"
+
+msgid "Proxy"
+msgstr "Прокси"
+
+msgid "Proxy URL is empty"
+msgstr "URL прокси пуст"
+
+msgid "Proxy URL must start with vless://, ss://, trojan://, hysteria2://, hy2:// or socks://"
+msgstr "URL прокси должен начинаться с vless://, ss://, trojan://, hysteria2://, hy2:// или socks://"
+
+msgid "Proxy link"
+msgstr "Ссылка на прокси"
+
+msgid "Proxy links"
+msgstr "Ссылки на прокси"
+
+msgid "Proxy-providers this group draws nodes from. Manage them on the Subscriptions page."
+msgstr "Подписки (proxy-providers), из которых группа берёт ноды. Управление — на вкладке «Подписки»."
+
+msgid "Proxy-server nameservers"
+msgstr "DNS-серверы для прокси-серверов"
+
+msgid "Raw mihomo outbound object (advanced)."
+msgstr "Сырой outbound-объект mihomo (для продвинутых)."
+
+msgid "Raw mihomo rule lines applied after the generated rules, before the final MATCH."
+msgstr "Сырые строки правил mihomo, применяются после сгенерированных правил, перед финальным MATCH."
+
+msgid "Raw mihomo rule lines evaluated first. e.g. %s or %s"
+msgstr "Сырые строки правил mihomo, проверяются первыми. Напр. %s или %s"
 
 msgid "Refresh"
 msgstr "Обновить"
 
+msgid "Resolvers for normal lookups. Plain IPs are the most reliable; overrides the single DNS server above when set."
+msgstr "Резолверы для обычных запросов. Надёжнее всего обычные IP; если заданы, переопределяют одиночный DNS-сервер выше."
+
+msgid "Resolvers used to look up your proxy/subscription server hostnames (avoids a chicken-and-egg with the proxy)."
+msgstr "Резолверы для разрешения имён твоих прокси/серверов подписок (снимает проблему курицы и яйца с прокси)."
+
+msgid "Restart"
+msgstr "Перезапустить"
+
+msgid "Routing"
+msgstr "Маршрутизация"
+
+msgid "Routing mode"
+msgstr "Режим маршрутизации"
+
+msgid "Routing mode, custom rule-sets and raw rule lines. Rule order: your \"before\" rules, then rule-sets (top to bottom), then community/route rules, then MATCH."
+msgstr "Режим маршрутизации, свои rule-set и сырые правила. Порядок: твои правила «before», затем rule-set (сверху вниз), затем правила community/route, затем MATCH."
+
+msgid "Rule-set"
+msgstr "Rule-set"
+
+msgid "Rules"
+msgstr "Правила"
+
+msgid "Rules — after"
+msgstr "Правила — после"
+
+msgid "Rules — before (highest priority)"
+msgstr "Правила — до (высший приоритет)"
+
+msgid "Running"
+msgstr "Работает"
+
 msgid "Running %s…"
 msgstr "Выполняется %s…"
 
-msgid "(no output)"
-msgstr "(нет вывода)"
+msgid "SOCKS URL has an invalid port"
+msgstr "Некорректный порт в SOCKS URL"
+
+msgid "SOCKS URL is missing the port"
+msgstr "В SOCKS URL отсутствует порт"
+
+msgid "SOCKS URL is missing the server host"
+msgstr "В SOCKS URL отсутствует хост сервера"
+
+msgid "SOCKS URL is missing the username"
+msgstr "В SOCKS URL отсутствует имя пользователя"
+
+msgid "SOCKS URL must not contain whitespace"
+msgstr "SOCKS URL не должен содержать пробелов"
+
+msgid "SOCKS URL must start with socks:// or socks5://"
+msgstr "SOCKS URL должен начинаться с socks:// или socks5://"
+
+msgid "Select (manual pick)"
+msgstr "Select (ручной выбор)"
+
+msgid "Selective (efficient)"
+msgstr "Selective (экономно)"
+
+msgid "Selective transparent proxy. Paste a proxy link and choose which lists route through it; everything else is routed directly by the kernel."
+msgstr "Выборочный прозрачный прокси. Вставьте ссылку на прокси и выберите, какие списки направлять через него; остальной трафик маршрутизируется ядром напрямую."
+
+msgid "Selective: only listed domains/subnets reach mihomo (efficient). Full: all LAN traffic is tproxied to mihomo, so every rule (incl. ipcidr) applies and unmatched traffic goes DIRECT."
+msgstr "Selective: до mihomo доходят только домены/подсети из списков (экономно). Full: весь трафик LAN заворачивается в mihomo, поэтому работает любое правило (включая ipcidr), а несовпавший трафик идёт DIRECT."
+
+msgid "Service"
+msgstr "Служба"
+
+msgid "Service running"
+msgstr "Служба работает"
+
+msgid "Service stopped"
+msgstr "Служба остановлена"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Shadowsocks URL has an invalid port"
+msgstr "Некорректный порт в Shadowsocks URL"
+
+msgid "Shadowsocks URL is missing the credentials"
+msgstr "В Shadowsocks URL отсутствуют учётные данные"
+
+msgid "Shadowsocks URL is missing the credentials@server separator"
+msgstr "В Shadowsocks URL нет разделителя credentials@server"
+
+msgid "Shadowsocks URL is missing the port"
+msgstr "В Shadowsocks URL отсутствует порт"
+
+msgid "Shadowsocks URL is missing the server host"
+msgstr "В Shadowsocks URL отсутствует хост сервера"
+
+msgid "Shadowsocks URL must not contain whitespace"
+msgstr "Shadowsocks URL не должен содержать пробелов"
+
+msgid "Shadowsocks URL must start with ss://"
+msgstr "Shadowsocks URL должен начинаться с ss://"
+
+msgid "Silent"
+msgstr "Тихий"
+
+msgid "Skip the dnsmasq takeover. Advanced: you must repoint client DNS to mihomo yourself."
+msgstr "Не перехватывать dnsmasq. Для продвинутых: перенаправить DNS клиентов на mihomo придётся вручную."
+
+msgid "Some providers gate content on the client User-Agent."
+msgstr "Некоторые провайдеры отдают контент в зависимости от User-Agent клиента."
+
+msgid "Start"
+msgstr "Запустить"
+
+msgid "Start %s automatically and route selected traffic through the proxy."
+msgstr "Автоматически запускать %s и направлять выбранный трафик через прокси."
+
+msgid "Status"
+msgstr "Состояние"
+
+msgid "Stop"
+msgstr "Остановить"
+
+msgid "Stopped"
+msgstr "Остановлен"
+
+msgid "Subscription"
+msgstr "Подписка"
+
+msgid "Subscription URL"
+msgstr "URL подписки"
+
+msgid "Subscriptions"
+msgstr "Подписки"
 
 msgid "Support"
 msgstr "Поддержка"
 
-msgid "Documentation"
-msgstr "Документация"
+msgid "Test"
+msgstr "Тест"
 
-msgid "Live proxy dashboard."
-msgstr "Живая панель прокси."
+msgid "Test URL"
+msgstr "URL для проверки"
+
+msgid "Test all"
+msgstr "Тест всех"
+
+msgid "Traffic entering on these interfaces is eligible for proxying. Matches the nft lan_ifaces set (device / ifname)."
+msgstr "Трафик, входящий с этих интерфейсов, может проксироваться. Соответствует nft-набору lan_ifaces (device / ifname)."
+
+msgid "Trojan URL has an invalid port"
+msgstr "Некорректный порт в Trojan URL"
+
+msgid "Trojan URL is missing the password"
+msgstr "В Trojan URL отсутствует пароль"
+
+msgid "Trojan URL is missing the password@server separator"
+msgstr "В Trojan URL нет разделителя password@server"
+
+msgid "Trojan URL is missing the port"
+msgstr "В Trojan URL отсутствует порт"
+
+msgid "Trojan URL is missing the server host"
+msgstr "В Trojan URL отсутствует хост сервера"
+
+msgid "Trojan URL must not contain whitespace"
+msgstr "Trojan URL не должен содержать пробелов"
+
+msgid "Trojan URL must start with trojan://"
+msgstr "Trojan URL должен начинаться с trojan://"
+
+msgid "UDP (plain, unencrypted)"
+msgstr "UDP (открытый, без шифрования)"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "URL test (auto fastest)"
+msgstr "URL-тест (авто-выбор быстрейшего)"
+
+msgid "Update interval (s)"
+msgstr "Интервал обновления (с)"
+
+msgid "User-Agent"
+msgstr "User-Agent"
+
+msgid "VLESS URL has an invalid port"
+msgstr "Некорректный порт в VLESS URL"
+
+msgid "VLESS URL is missing the UUID"
+msgstr "В VLESS URL отсутствует UUID"
+
+msgid "VLESS URL is missing the UUID@server separator"
+msgstr "В VLESS URL нет разделителя UUID@server"
+
+msgid "VLESS URL is missing the port"
+msgstr "В VLESS URL отсутствует порт"
+
+msgid "VLESS URL is missing the server host"
+msgstr "В VLESS URL отсутствует хост сервера"
+
+msgid "VLESS URL must not contain whitespace"
+msgstr "VLESS URL не должен содержать пробелов"
+
+msgid "VLESS URL must start with vless://"
+msgstr "VLESS URL должен начинаться с vless://"
+
+msgid "Version"
+msgstr "Версия"
+
+msgid "Warning"
+msgstr "Предупреждение"
+
+msgid "Which proxy group this bucket routes through."
+msgstr "Через какую группу прокси идёт этот набор."
+
+msgid "classical"
+msgstr "classical"
+
+msgid "domain"
+msgstr "domain"
+
+msgid "http(s) rule-provider URL (leave empty for a local file)."
+msgstr "URL rule-provider по http(s) (оставь пустым для локального файла)."
+
+msgid "ipcidr"
+msgstr "ipcidr"
+
+msgid "mihomo proxy-providers. Each subscription URL is fetched and health-checked by mihomo; reference a subscription by name from a proxy group on the Connection page."
+msgstr "proxy-providers mihomo. mihomo сам скачивает и проверяет каждую подписку; ссылайся на подписку по имени из группы прокси на вкладке «Подключение»."
+
+msgid "n/a"
+msgstr "н/д"
+
+msgid "nftables"
+msgstr "nftables"
+
+msgid "no-resolve"
+msgstr "no-resolve"
+
+msgid "test failed"
+msgstr "тест не прошёл"
+
+msgid "timeout"
+msgstr "таймаут"

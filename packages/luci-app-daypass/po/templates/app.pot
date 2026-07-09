@@ -2,124 +2,120 @@ msgid ""
 msgstr ""
 "Project-Id-Version: luci-app\n"
 "Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-07-08 00:00+0000\n"
+"Language-Team: none\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-msgid "Selective transparent proxy. Paste a proxy link and choose which lists route through it; everything else is routed directly by the kernel."
+msgid "%s — Diagnostics"
 msgstr ""
 
-msgid "Service"
+msgid "%s — Proxies"
 msgstr ""
 
-msgid "Enable at boot"
-msgstr ""
-
-msgid "Start %s automatically and route selected traffic through the proxy."
-msgstr ""
-
-msgid "Status"
-msgstr ""
-
-msgid "Running"
-msgstr ""
-
-msgid "Stopped"
-msgstr ""
-
-msgid "Control"
-msgstr ""
-
-msgid "Start"
-msgstr ""
-
-msgid "Stop"
-msgstr ""
-
-msgid "Restart"
-msgstr ""
-
-msgid "Proxy"
-msgstr ""
-
-msgid "One outbound group. Paste a single connection link, list several for auto-selection, or supply raw outbound JSON."
-msgstr ""
-
-msgid "Enabled"
-msgstr ""
-
-msgid "Type"
-msgstr ""
-
-msgid "Single link"
-msgstr ""
-
-msgid "Selector (manual pick)"
-msgstr ""
-
-msgid "URL test (auto fastest)"
-msgstr ""
-
-msgid "Raw outbound JSON"
-msgstr ""
-
-msgid "Proxy link"
-msgstr ""
-
-msgid "vless:// ss:// trojan:// hysteria2:// (hy2://) or socks:// link."
-msgstr ""
-
-msgid "Invalid proxy link"
-msgstr ""
-
-msgid "Proxy links"
-msgstr ""
-
-msgid "One connection link per entry for selector / url-test groups."
-msgstr ""
-
-msgid "Outbound JSON"
-msgstr ""
-
-msgid "Test URL"
-msgstr ""
-
-msgid "Routing"
-msgstr ""
-
-msgid "One routing bucket: pick the community lists (and any custom domains/subnets) that should travel through a proxy."
-msgstr ""
-
-msgid "Which proxy group this bucket routes through."
-msgstr ""
-
-msgid "Community lists"
-msgstr ""
-
-msgid "Domains and subnets in the selected lists are routed through the proxy."
-msgstr ""
-
-msgid "Custom domains"
-msgstr ""
-
-msgid "Custom subnets"
+msgid "%s — Rules"
 msgstr ""
 
 msgid "%s — Settings"
 msgstr ""
 
-msgid "Settings"
+msgid "%s — Subscriptions"
+msgstr ""
+
+msgid "%s → %s"
+msgstr ""
+
+msgid "(log empty)"
+msgstr ""
+
+msgid "(no output)"
+msgstr ""
+
+msgid "A proxy group. Its members can be a single link, several links, subscriptions, and/or raw outbound JSON — combine as needed."
+msgstr ""
+
+msgid "A single vless:// ss:// trojan:// hysteria2:// (hy2://) or socks:// link."
+msgstr ""
+
+msgid "API secret"
+msgstr ""
+
+msgid "Absolute path to a local rule file (alternative to URL)."
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "Add a DIRECT entry to the group (useful as a manual bypass option)."
+msgstr ""
+
+msgid "Advanced"
+msgstr ""
+
+msgid "App"
+msgstr ""
+
+msgid "Bearer token for the mihomo REST API (127.0.0.1:9090). Auto-generated on first boot."
+msgstr ""
+
+msgid "Behavior"
+msgstr ""
+
+msgid "Block QUIC (UDP/443) so browsers fall back to TCP/TLS for more reliable sniffing."
+msgstr ""
+
+msgid "Bootstrap DNS server"
+msgstr ""
+
+msgid "Bundled clash dashboard served by mihomo external-ui."
+msgstr ""
+
+msgid "Checking service status…"
+msgstr ""
+
+msgid "Checks"
+msgstr ""
+
+msgid "Clash/mihomo subscription (proxy-provider) link."
+msgstr ""
+
+msgid "Community lists"
+msgstr ""
+
+msgid "Config"
+msgstr ""
+
+msgid "Connection"
+msgstr ""
+
+msgid "Core (mihomo)"
+msgstr ""
+
+msgid "Core log"
+msgstr ""
+
+msgid "Core, DNS, network and list settings. Defaults are safe; change only what you need."
+msgstr ""
+
+msgid "Custom domains"
+msgstr ""
+
+msgid "Custom rule-sets"
+msgstr ""
+
+msgid "Custom subnets"
 msgstr ""
 
 msgid "DNS"
 msgstr ""
 
-msgid "Network"
+msgid "DNS over HTTPS (DoH)"
 msgstr ""
 
-msgid "Lists"
-msgstr ""
-
-msgid "Advanced"
+msgid "DNS over TLS (DoT)"
 msgstr ""
 
 msgid "DNS protocol"
@@ -128,28 +124,16 @@ msgstr ""
 msgid "DNS server"
 msgstr ""
 
-msgid "Bootstrap DNS server"
-msgstr ""
-
-msgid "LAN interfaces"
-msgstr ""
-
-msgid "List update interval"
-msgstr ""
-
-msgid "Every hour"
-msgstr ""
-
 msgid "Daily"
 msgstr ""
 
-msgid "Log level"
-msgstr ""
-
-msgid "API secret"
-msgstr ""
-
 msgid "Dashboard"
+msgstr ""
+
+msgid "Debug"
+msgstr ""
+
+msgid "Diagnostics"
 msgstr ""
 
 msgid "Disable QUIC"
@@ -158,44 +142,464 @@ msgstr ""
 msgid "Do not modify DHCP/DNS"
 msgstr ""
 
-msgid "%s — Diagnostics"
+msgid "Documentation"
 msgstr ""
 
-msgid "Version"
+msgid "Domains and subnets in the selected lists are routed through the proxy."
 msgstr ""
 
-msgid "App"
+msgid "Enable at boot"
 msgstr ""
 
-msgid "Core (mihomo)"
+msgid "Enabled"
 msgstr ""
 
-msgid "Checks"
+msgid "Error"
 msgstr ""
 
-msgid "Config"
+msgid "Every 12 hours"
 msgstr ""
 
-msgid "nftables"
+msgid "Every 3 days"
 msgstr ""
 
-msgid "Core log"
+msgid "Every 3 hours"
+msgstr ""
+
+msgid "Every hour"
+msgstr ""
+
+msgid "External (URL) or local (file) rule providers, each routed to an action."
+msgstr ""
+
+msgid "Extra CIDR subnets to route through the proxy."
+msgstr ""
+
+msgid "Extra domains to route through the proxy."
+msgstr ""
+
+msgid "Failed to resolve the dashboard address"
+msgstr ""
+
+msgid "Failed to switch %s"
+msgstr ""
+
+msgid "Fallback (first alive)"
+msgstr ""
+
+msgid "For ipcidr rules: match on the destination IP without a DNS lookup."
+msgstr ""
+
+msgid "Format"
+msgstr ""
+
+msgid "Full (all traffic via mihomo)"
+msgstr ""
+
+msgid "Group"
+msgstr ""
+
+msgid "Group type"
+msgstr ""
+
+msgid "Gzipped mihomo path"
+msgstr ""
+
+msgid "Health-check URL"
+msgstr ""
+
+msgid "Health-check URL for url-test / fallback groups."
+msgstr ""
+
+msgid "Health-check interval (s)"
+msgstr ""
+
+msgid "How often mihomo refreshes the subscription."
+msgstr ""
+
+msgid "How often subnet lists are refreshed into the nft set."
+msgstr ""
+
+msgid "Hysteria2 URL has an invalid port"
+msgstr ""
+
+msgid "Hysteria2 URL has an unsupported obfs type"
+msgstr ""
+
+msgid "Hysteria2 URL is missing the password"
+msgstr ""
+
+msgid "Hysteria2 URL is missing the password@server separator"
+msgstr ""
+
+msgid "Hysteria2 URL is missing the port"
+msgstr ""
+
+msgid "Hysteria2 URL is missing the server host"
+msgstr ""
+
+msgid "Hysteria2 URL must not contain whitespace"
+msgstr ""
+
+msgid "Hysteria2 URL must start with hysteria2:// or hy2://"
+msgstr ""
+
+msgid "Include DIRECT"
+msgstr ""
+
+msgid "Info"
+msgstr ""
+
+msgid "Invalid proxy link"
+msgstr ""
+
+msgid "LAN interfaces"
+msgstr ""
+
+msgid "Latency"
+msgstr ""
+
+msgid "List update interval"
+msgstr ""
+
+msgid "Lists"
+msgstr ""
+
+msgid "Live proxy dashboard."
+msgstr ""
+
+msgid "Local file"
+msgstr ""
+
+msgid "Log level"
+msgstr ""
+
+msgid "Monitor proxies, traffic and connections in the mihomo web dashboard."
+msgstr ""
+
+msgid "Must be an http(s) URL"
+msgstr ""
+
+msgid "Nameservers"
+msgstr ""
+
+msgid "Network"
+msgstr ""
+
+msgid "No proxy groups found. Is the service running and are subscriptions loaded?"
+msgstr ""
+
+msgid "Node"
+msgstr ""
+
+msgid "One connection link per entry."
+msgstr ""
+
+msgid "One routing bucket: pick the community lists (and any custom domains/subnets) that should travel through a proxy."
+msgstr ""
+
+msgid "Open dashboard"
+msgstr ""
+
+msgid "Outbound JSON"
+msgstr ""
+
+msgid "PROXY, DIRECT, REJECT or a proxy group name."
+msgstr ""
+
+msgid "Path to a gzipped mihomo binary to unpack to tmpfs when /usr/bin/mihomo is absent (small-flash routers). Empty uses the shipped default."
+msgstr ""
+
+msgid "Pick a check above."
+msgstr ""
+
+msgid "Pick which node each Select group uses. Auto-select groups (URL-test / Fallback) are read-only. Selection is live and persists across restarts. Use Test to measure per-node latency."
+msgstr ""
+
+msgid "Plain IP (recommended) or a DoH/DoT URL. Used when the Nameservers list is empty."
+msgstr ""
+
+msgid "Plain-IP resolver used to look up DoH/DoT server hostnames."
+msgstr ""
+
+msgid "Protocol for the single DNS server below. For several resolvers use the Nameservers list instead."
+msgstr ""
+
+msgid "Proxies"
+msgstr ""
+
+msgid "Proxy"
+msgstr ""
+
+msgid "Proxy URL is empty"
+msgstr ""
+
+msgid "Proxy URL must start with vless://, ss://, trojan://, hysteria2://, hy2:// or socks://"
+msgstr ""
+
+msgid "Proxy link"
+msgstr ""
+
+msgid "Proxy links"
+msgstr ""
+
+msgid "Proxy-providers this group draws nodes from. Manage them on the Subscriptions page."
+msgstr ""
+
+msgid "Proxy-server nameservers"
+msgstr ""
+
+msgid "Raw mihomo outbound object (advanced)."
+msgstr ""
+
+msgid "Raw mihomo rule lines applied after the generated rules, before the final MATCH."
+msgstr ""
+
+msgid "Raw mihomo rule lines evaluated first. e.g. %s or %s"
 msgstr ""
 
 msgid "Refresh"
 msgstr ""
 
+msgid "Resolvers for normal lookups. Plain IPs are the most reliable; overrides the single DNS server above when set."
+msgstr ""
+
+msgid "Resolvers used to look up your proxy/subscription server hostnames (avoids a chicken-and-egg with the proxy)."
+msgstr ""
+
+msgid "Restart"
+msgstr ""
+
+msgid "Routing"
+msgstr ""
+
+msgid "Routing mode"
+msgstr ""
+
+msgid "Routing mode, custom rule-sets and raw rule lines. Rule order: your \"before\" rules, then rule-sets (top to bottom), then community/route rules, then MATCH."
+msgstr ""
+
+msgid "Rule-set"
+msgstr ""
+
+msgid "Rules"
+msgstr ""
+
+msgid "Rules — after"
+msgstr ""
+
+msgid "Rules — before (highest priority)"
+msgstr ""
+
+msgid "Running"
+msgstr ""
+
 msgid "Running %s…"
 msgstr ""
 
-msgid "(no output)"
+msgid "SOCKS URL has an invalid port"
+msgstr ""
+
+msgid "SOCKS URL is missing the port"
+msgstr ""
+
+msgid "SOCKS URL is missing the server host"
+msgstr ""
+
+msgid "SOCKS URL is missing the username"
+msgstr ""
+
+msgid "SOCKS URL must not contain whitespace"
+msgstr ""
+
+msgid "SOCKS URL must start with socks:// or socks5://"
+msgstr ""
+
+msgid "Select (manual pick)"
+msgstr ""
+
+msgid "Selective (efficient)"
+msgstr ""
+
+msgid "Selective transparent proxy. Paste a proxy link and choose which lists route through it; everything else is routed directly by the kernel."
+msgstr ""
+
+msgid "Selective: only listed domains/subnets reach mihomo (efficient). Full: all LAN traffic is tproxied to mihomo, so every rule (incl. ipcidr) applies and unmatched traffic goes DIRECT."
+msgstr ""
+
+msgid "Service"
+msgstr ""
+
+msgid "Service running"
+msgstr ""
+
+msgid "Service stopped"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Shadowsocks URL has an invalid port"
+msgstr ""
+
+msgid "Shadowsocks URL is missing the credentials"
+msgstr ""
+
+msgid "Shadowsocks URL is missing the credentials@server separator"
+msgstr ""
+
+msgid "Shadowsocks URL is missing the port"
+msgstr ""
+
+msgid "Shadowsocks URL is missing the server host"
+msgstr ""
+
+msgid "Shadowsocks URL must not contain whitespace"
+msgstr ""
+
+msgid "Shadowsocks URL must start with ss://"
+msgstr ""
+
+msgid "Silent"
+msgstr ""
+
+msgid "Skip the dnsmasq takeover. Advanced: you must repoint client DNS to mihomo yourself."
+msgstr ""
+
+msgid "Some providers gate content on the client User-Agent."
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Start %s automatically and route selected traffic through the proxy."
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Stop"
+msgstr ""
+
+msgid "Stopped"
+msgstr ""
+
+msgid "Subscription"
+msgstr ""
+
+msgid "Subscription URL"
+msgstr ""
+
+msgid "Subscriptions"
 msgstr ""
 
 msgid "Support"
 msgstr ""
 
-msgid "Documentation"
+msgid "Test"
 msgstr ""
 
-msgid "Live proxy dashboard."
+msgid "Test URL"
+msgstr ""
+
+msgid "Test all"
+msgstr ""
+
+msgid "Traffic entering on these interfaces is eligible for proxying. Matches the nft lan_ifaces set (device / ifname)."
+msgstr ""
+
+msgid "Trojan URL has an invalid port"
+msgstr ""
+
+msgid "Trojan URL is missing the password"
+msgstr ""
+
+msgid "Trojan URL is missing the password@server separator"
+msgstr ""
+
+msgid "Trojan URL is missing the port"
+msgstr ""
+
+msgid "Trojan URL is missing the server host"
+msgstr ""
+
+msgid "Trojan URL must not contain whitespace"
+msgstr ""
+
+msgid "Trojan URL must start with trojan://"
+msgstr ""
+
+msgid "UDP (plain, unencrypted)"
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "URL test (auto fastest)"
+msgstr ""
+
+msgid "Update interval (s)"
+msgstr ""
+
+msgid "User-Agent"
+msgstr ""
+
+msgid "VLESS URL has an invalid port"
+msgstr ""
+
+msgid "VLESS URL is missing the UUID"
+msgstr ""
+
+msgid "VLESS URL is missing the UUID@server separator"
+msgstr ""
+
+msgid "VLESS URL is missing the port"
+msgstr ""
+
+msgid "VLESS URL is missing the server host"
+msgstr ""
+
+msgid "VLESS URL must not contain whitespace"
+msgstr ""
+
+msgid "VLESS URL must start with vless://"
+msgstr ""
+
+msgid "Version"
+msgstr ""
+
+msgid "Warning"
+msgstr ""
+
+msgid "Which proxy group this bucket routes through."
+msgstr ""
+
+msgid "classical"
+msgstr ""
+
+msgid "domain"
+msgstr ""
+
+msgid "http(s) rule-provider URL (leave empty for a local file)."
+msgstr ""
+
+msgid "ipcidr"
+msgstr ""
+
+msgid "mihomo proxy-providers. Each subscription URL is fetched and health-checked by mihomo; reference a subscription by name from a proxy group on the Connection page."
+msgstr ""
+
+msgid "n/a"
+msgstr ""
+
+msgid "nftables"
+msgstr ""
+
+msgid "no-resolve"
+msgstr ""
+
+msgid "test failed"
+msgstr ""
+
+msgid "timeout"
 msgstr ""
