@@ -99,7 +99,7 @@ Policy routing (installed by init, torn down on stop):
 `ip route add local 0.0.0.0/0 dev lo table 105`.
 
 The tproxy port comes from the shared constants used by BOTH the nft template
-and the config generator — never hardcode it in only one place (podkop's bug).
+and the config generator — never hardcode it in only one place.
 
 ### ucode invocation & validation notes (verified against real mihomo/nft)
 

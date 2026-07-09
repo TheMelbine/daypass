@@ -1,6 +1,6 @@
 # daypass
 
-Выборочный прозрачный прокси для OpenWrt на ядре [mihomo](https://github.com/MetaCubeX/mihomo). Через прокси идёт только выбранный трафик (домены или подсети), остальное роутер шлёт напрямую мимо mihomo. Как [podkop](https://github.com/itdoginfo/podkop), но только mihomo и только TPROXY, без sing-box и TUN.
+Выборочный прозрачный прокси для OpenWrt на ядре [mihomo](https://github.com/MetaCubeX/mihomo). Через прокси идёт только выбранный трафик (домены или подсети), остальное роутер шлёт напрямую мимо mihomo.
 
 ## Установка
 
@@ -38,4 +38,4 @@ make ipk BRAND=<name>   # своя марка через branding/<name>.mk
 
 ## Кредиты
 
-[podkop](https://github.com/itdoginfo/podkop) · [mihomo](https://github.com/MetaCubeX/mihomo) · списки [itdoginfo/allow-domains](https://github.com/itdoginfo/allow-domains), [runetfreedom](https://github.com/runetfreedom). Лицензия [GPL-3.0-or-later](LICENSE).
+[mihomo](https://github.com/MetaCubeX/mihomo) · списки [itdoginfo/allow-domains](https://github.com/itdoginfo/allow-domains), [runetfreedom](https://github.com/runetfreedom). Лицензия [GPL-3.0-or-later](LICENSE).

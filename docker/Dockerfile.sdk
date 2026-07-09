@@ -4,8 +4,7 @@
 # `feeds update -a` clones the base/luci/packages/routing/telephony feeds, then
 # `make defconfig` initialises the toolchain — together ~4 min. We bake that in
 # here ONCE so the per-build image (docker/Dockerfile.build) only has to COPY our
-# package sources and `make compile` (seconds). Same trick podkop uses with its
-# itdoginfo/openwrt-sdk-ipk base image.
+# package sources and `make compile` (seconds).
 #
 # Rebuild + push this image only when SDK_IMAGE (the OpenWrt version/arch) changes
 # — the sdk-image workflow does that. Downstream builds pull the cached result.

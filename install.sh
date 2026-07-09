@@ -6,7 +6,7 @@
 #
 # Downloads the latest release (mihomo core + daypass + luci-app-daypass, matching
 # the router's architecture) and installs them. mihomo is NOT in the official
-# OpenWrt feed, so we ship it ourselves. Modeled on itdoginfo/podkop's installer.
+# OpenWrt feed, so we ship it ourselves.
 
 set -u
 

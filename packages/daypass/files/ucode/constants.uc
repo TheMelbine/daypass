@@ -37,7 +37,7 @@ const BYPASS_MASK_HEX = '0x00200000';
 const RT_TABLE_ID = 105;
 const RT_RULE_PREF = 105;
 
-// reserved / bogon IPv4 that must never be proxied (podkop localv4 set)
+// reserved / bogon IPv4 that must never be proxied
 const LOCALV4 = [
 	'0.0.0.0/8', '10.0.0.0/8', '127.0.0.0/8', '169.254.0.0/16',
 	'172.16.0.0/12', '192.0.0.0/24', '192.0.2.0/24', '192.88.99.0/24',

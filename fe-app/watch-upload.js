@@ -1,6 +1,5 @@
 // Dev SFTP push loop. Watches the built bundle (and the neutral source trees)
-// and mirrors changes to a live test router over SFTP. Adapted from
-// fe-app-podkop/watch-upload.js.
+// and mirrors changes to a live test router over SFTP.
 //
 // Point REMOTE_DIR_FE at the installed brand path on the device, e.g.
 // /www/luci-static/resources/view/daypass (the Makefile renames view/app -> view/<pkg>).
