@@ -1,9 +1,10 @@
 name: build
 
 # Compiles the .ipk on top of the pre-baked daypass-sdk image (see sdk-image.yml
-# / docker/Dockerfile.sdk). Because the SDK, feeds and toolchain are already in
-# the base image, this is fast. Runs on release tags or on demand — not on every
-# push (fixes go to the device directly; .ipk are a release artifact).
+# / docker/Dockerfile.sdk). Runs on the self-hosted ffm runner: plain `docker
+# build` on the host daemon so the baked SDK image and build layers persist on
+# disk between runs — the ~2 GB image is pulled once, then rebuilds are fast (no
+# pull, no feeds clone). Triggered on release tags or on demand.
 on:
   workflow_dispatch:
   push:
@@ -16,37 +17,35 @@ permissions:
 jobs:
   packages:
     name: aarch64_cortex-a53 · openwrt-24.10
-    runs-on: ubuntu-latest
+    runs-on: [ self-hosted, ffm ]
     steps:
       - uses: actions/checkout@v4
 
       - id: vars
         run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Plain docker build on the host daemon — reuses the host's image store and
+      # layer cache across runs (the win of a persistent self-hosted runner).
       - name: Compile packages (pre-baked SDK)
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: docker/Dockerfile.build
-          build-args: |
-            SDK_IMAGE=ghcr.io/${{ steps.vars.outputs.owner }}/daypass-sdk:openwrt-24.10
-          load: true
-          tags: daypass:ci
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: |
+          docker build \
+            --build-arg SDK_IMAGE=ghcr.io/${{ steps.vars.outputs.owner }}/daypass-sdk:openwrt-24.10 \
+            -f docker/Dockerfile.build \
+            -t daypass:ci .
 
       - name: Extract .ipk from the built image
         run: |
-          docker create --name c daypass:ci
-          docker cp c:/builder/bin/packages ./binpkgs
-          docker rm c
+          docker rm -f daypass-ci >/dev/null 2>&1 || true
+          docker create --name daypass-ci daypass:ci
+          rm -rf ./binpkgs ./dist
+          docker cp daypass-ci:/builder/bin/packages ./binpkgs
+          docker rm daypass-ci
           mkdir -p dist
           for pat in 'mihomo_*' 'daypass_*' 'luci-app-daypass_*' 'luci-i18n-daypass-*'; do
             find ./binpkgs -name "$pat.ipk" -exec cp {} dist/ \;
