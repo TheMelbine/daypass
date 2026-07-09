@@ -24,14 +24,40 @@ const dns_type = get('settings', 'dns_type', 'doh');
 const dns_server = get('settings', 'dns_server', 'https://1.1.1.1/dns-query');
 const bootstrap = get('settings', 'bootstrap_dns_server', '1.1.1.1');
 const disable_quic = uci_bool(get('settings', 'disable_quic', '0'));
+// selective: nft marks only fake-ip + subnet sets, so everything mihomo sees is
+// meant for the proxy (MATCH -> proxy). full: nft tproxies ALL lan traffic, so
+// mihomo's whole rule set (incl. ipcidr on real dst) applies (MATCH -> direct).
+const routing_mode = get('settings', 'routing_mode', 'selective');
 
-// ---- proxies + proxy-groups (one group per enabled 'proxy' section) ----
-let proxies = [];
-let groups = [];
+let proxies = [];        // inline proxy objects
+let groups = [];         // proxy-groups
+let proxy_providers = {}; // subscriptions
+let rule_providers = {}; // rule-sets
+let fakeip_filter = [];  // domains that DO get a fake-ip (whitelist)
+let rules = [];          // final rule list, in order
+let default_group = null;
 
+// -------------------- subscriptions -> proxy-providers --------------------
+uci.foreach(C.PKG_NAME, 'subscription', (s) => {
+	if (!uci_bool(s.enabled)) return;
+	let n = s['.name'];
+	proxy_providers[n] = {
+		type: 'http',
+		url: s.url,
+		interval: int(s.interval || '3600'),
+		path: C.PROVIDERS_REL + '/proxy/' + n + '.yaml',
+		header: { 'User-Agent': [ s.user_agent || 'clash.meta' ] },
+		'health-check': {
+			enable: true,
+			url: s.health_check_url || 'https://www.gstatic.com/generate_204',
+			interval: int(s.health_check_interval || '300'),
+		},
+	};
+});
+
+// -------------------- proxies + proxy-groups --------------------
 function add_proxy(p) {
 	if (p == null) return null;
-	// ensure a name
 	if (p.name == null || p.name == '') p.name = p.server;
 	push(proxies, p);
 	return p.name;
@@ -42,48 +68,88 @@ uci.foreach(C.PKG_NAME, 'proxy', (s) => {
 	let id = s['.name'];
 	let members = [];
 
-	let t = s.type || 'url';
-	if (t == 'raw' && s.outbound_json) {
+	// inline single URL
+	if (s.proxy_string) {
+		let nm = add_proxy(parse_proxy_url(s.proxy_string, id));
+		if (nm) push(members, nm);
+	}
+	// inline multiple URLs
+	let i = 0;
+	for (let link in uci_array(s.links)) {
+		let nm = add_proxy(parse_proxy_url(link, id + '-' + (++i)));
+		if (nm) push(members, nm);
+	}
+	// raw mihomo proxy object
+	if (s.outbound_json) {
 		let obj = json(s.outbound_json);
 		if (type(obj) == 'object') {
 			if (obj.name == null) obj.name = id + '-raw';
 			push(proxies, obj);
 			push(members, obj.name);
 		}
-	} else if (t == 'url') {
-		let nm = add_proxy(parse_proxy_url(s.proxy_string || '', id));
-		if (nm) push(members, nm);
-	} else { // selector | urltest
-		let i = 0;
-		for (let link in uci_array(s.links)) {
-			let nm = add_proxy(parse_proxy_url(link, id + '-' + (++i)));
-			if (nm) push(members, nm);
-		}
 	}
+	if (uci_bool(s.include_direct)) push(members, 'DIRECT');
 
-	if (length(members) == 0) return;
+	// subscriptions this group draws from
+	let uses = uci_array(s.subscriptions);
 
-	let g = { name: id, proxies: members };
-	if (t == 'urltest') {
+	if (length(members) == 0 && length(uses) == 0) return;
+
+	let t = s.type || 'select';
+	let g = { name: id };
+	if (t == 'urltest' || t == 'url-test') {
 		g.type = 'url-test';
 		g.url = s.test_url || 'https://www.gstatic.com/generate_204';
 		g.interval = int(s.test_interval || '300');
 		g.tolerance = int(s.tolerance || '50');
+	} else if (t == 'fallback') {
+		g.type = 'fallback';
+		g.url = s.test_url || 'https://www.gstatic.com/generate_204';
+		g.interval = int(s.test_interval || '300');
 	} else {
 		g.type = 'select';
 	}
+	if (length(members) > 0) g.proxies = members;
+	if (length(uses) > 0) g.use = uses;
 	push(groups, g);
+
+	if (default_group == null) default_group = id;
 });
 
-// ---- routes -> rule-providers, fake-ip-filter, rules ----
-let providers = {};
-let fakeip_filter = [];
-let rules = [];
-let default_group = null;
+// -------------------- custom rule-providers (rulesets) --------------------
+function ruleset_ext(fmt) {
+	if (fmt == 'yaml') return 'yaml';
+	if (fmt == 'text') return 'txt';
+	return 'mrs';
+}
 
+uci.foreach(C.PKG_NAME, 'ruleset', (s) => {
+	if (!uci_bool(s.enabled)) return;
+	let n = s['.name'];
+	let beh = s.behavior || 'domain';
+	let fmt = s.format || 'mrs';
+	let act = s.action || 'PROXY';
+
+	rule_providers[n] = {
+		type: 'http', behavior: beh, format: fmt,
+		url: s.url,
+		path: C.PROVIDERS_REL + '/rule/' + n + '.' + ruleset_ext(fmt),
+		interval: int(s.interval || '86400'),
+	};
+
+	let rule = 'RULE-SET,' + n + ',' + act;
+	if (beh == 'ipcidr' && uci_bool(s.no_resolve)) rule += ',no-resolve';
+	push(rules, rule);
+
+	// A domain must get a fake-ip to be handled by mihomo (proxied OR rejected).
+	// DIRECT domains must NOT be fake-ip'd, so they resolve real and bypass mihomo.
+	if (beh == 'domain' && act != 'DIRECT') push(fakeip_filter, 'rule-set:' + n);
+});
+
+// -------------------- community lists + routes --------------------
 function provider_for_tag(tag) {
-	if (providers[tag]) return;
-	providers[tag] = {
+	if (rule_providers[tag]) return;
+	rule_providers[tag] = {
 		type: 'http', behavior: 'domain', format: 'mrs',
 		url: C.LISTS_BASE + '/' + tag + '_domain.mrs',
 		path: C.PROVIDERS_REL + '/rule/' + tag + '.mrs',
@@ -93,7 +159,7 @@ function provider_for_tag(tag) {
 }
 
 function provider_for_remote(name, url) {
-	providers[name] = {
+	rule_providers[name] = {
 		type: 'http', behavior: 'domain', format: 'mrs',
 		url: url, path: C.PROVIDERS_REL + '/rule/' + name + '.mrs',
 		interval: 86400, proxy: 'DIRECT',
@@ -123,11 +189,21 @@ uci.foreach(C.PKG_NAME, 'route', (s) => {
 	}
 });
 
-// catch-all: anything else that reached the tproxy listener (e.g. subnet flows)
-push(rules, 'MATCH,' + (default_group != null ? default_group : 'DIRECT'));
+// -------------------- inline custom rules --------------------
+// settings.prepend_rules run BEFORE everything (highest priority: QUIC blocks,
+// DIRECT exceptions, private-IP bypasses). settings.append_rules run after the
+// generated rules but before the final MATCH.
+let prepend = uci_array(uci.get(C.PKG_NAME, 'settings', 'prepend_rules'));
+let append = uci_array(uci.get(C.PKG_NAME, 'settings', 'append_rules'));
+if (length(prepend) > 0) rules = [ ...prepend, ...rules ];
+for (let r in append) push(rules, r);
 
-// ---- DNS ----
-let nameserver = [ dns_server ];
+// catch-all: full mode routes the unmatched majority DIRECT; selective mode sends
+// the (already pre-filtered) remainder to the proxy. Overridable via match_action.
+let match_default = (routing_mode == 'full') ? 'DIRECT' : (default_group != null ? default_group : 'DIRECT');
+push(rules, 'MATCH,' + get('settings', 'match_action', match_default));
+
+// -------------------- DNS --------------------
 let dns = {
 	enable: true,
 	listen: C.DNS_ADDR + ':' + C.DNS_PORT,
@@ -138,11 +214,11 @@ let dns = {
 	'fake-ip-filter': fakeip_filter,
 	'fake-ip-ttl': 1,
 	'default-nameserver': [ bootstrap ],
-	nameserver: nameserver,
+	nameserver: [ dns_server ],
 	'proxy-server-nameserver': [ bootstrap ],
 };
 
-// ---- sniffer ----
+// -------------------- sniffer --------------------
 let sniff = {
 	HTTP: { ports: [ 80, '8080-8880' ] },
 	TLS:  { ports: [ 443, 8443 ] },
@@ -153,7 +229,7 @@ let sniffer = {
 	'override-destination': false, sniff: sniff, 'skip-domain': [ '+.lan' ],
 };
 
-// ---- assemble ----
+// -------------------- assemble --------------------
 let config = {
 	mode: 'rule',
 	ipv6: false,
@@ -173,8 +249,9 @@ let config = {
 	dns: dns,
 	sniffer: sniffer,
 	proxies: proxies,
+	'proxy-providers': proxy_providers,
 	'proxy-groups': groups,
-	'rule-providers': providers,
+	'rule-providers': rule_providers,
 	rules: rules,
 };
 
