@@ -8,15 +8,20 @@
 ARG SDK_IMAGE=ghcr.io/themelbine/daypass-sdk:openwrt-24.10
 FROM ${SDK_IMAGE}
 
-# Our three packages become a local feed named "daypass" rooted at /feed. `-f`
-# on install forces our mihomo (a prebuilt-binary package) to override the same
-# name in the official packages feed. mihomo's PKG_SOURCE is downloaded during
-# compile; the two arch-all packages have nothing to cross-compile.
-COPY --chown=1000:1000 packages/mihomo           /feed/mihomo
-COPY --chown=1000:1000 packages/daypass          /feed/daypass
-COPY --chown=1000:1000 packages/luci-app-daypass /feed/luci-app-daypass
+# Preserve the repo's packages/ + branding/ sibling layout: each package Makefile
+# resolves its brand tokens via `$(realpath <Makefile>)/../../branding/brand.mk`,
+# so the feed root must be the directory that holds BOTH packages/ and branding/
+# (this is exactly how gh-action-sdk mounts the repo root as the feed). A flat
+# copy of individual package dirs would break that ../../branding relativity and
+# leave PKG_NAME empty.
+COPY --chown=1000:1000 packages /src/packages
+COPY --chown=1000:1000 branding /src/branding
 
-RUN echo "src-link daypass /feed" >> feeds.conf && \
+# src-link feed rooted at /src; feeds scans packages/ recursively for our three
+# packages. `-f` forces our prebuilt-binary mihomo to override the same name in
+# the official packages feed. mihomo's PKG_SOURCE is fetched during compile; the
+# two arch-all packages have nothing to cross-compile.
+RUN echo "src-link daypass /src" >> feeds.conf && \
 	./scripts/feeds update daypass && \
 	./scripts/feeds install -p daypass -f mihomo daypass luci-app-daypass && \
 	make defconfig && \
