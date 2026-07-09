@@ -35,7 +35,7 @@ cmd_check() {
 	mihomo="$(mihomo_bin)" || { echo "mihomo binary not found" >&2; return 1; }
 	mkdir -p "$UI_DIR"
 	# SAFE_PATHS mirrors the init env so external-ui (outside home) passes -t
-	SAFE_PATHS="$UI_DIR" "$mihomo" -d "$HOME_DIR" -t
+	SAFE_PATHS="$(safe_paths)" "$mihomo" -d "$HOME_DIR" -t
 }
 
 # --- nftables + policy routing ---
@@ -105,9 +105,10 @@ case "$1" in
 	list_update)   cmd_list_update ;;
 	lists)         cmd_lists ;;
 	status)        cmd_status ;;
+	safe_paths)    safe_paths ;;
 	selftest)      cmd_selftest ;;
 	*)
-		echo "usage: ${PKG_NAME} {generate|check|mihomo_path|fw_start|fw_stop|dns_takeover|dns_restore|list_update|lists|status|selftest}" >&2
+		echo "usage: ${PKG_NAME} {generate|check|mihomo_path|safe_paths|fw_start|fw_stop|dns_takeover|dns_restore|list_update|lists|status|selftest}" >&2
 		exit 1
 		;;
 esac
