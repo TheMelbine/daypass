@@ -15,6 +15,22 @@ const FALLBACK_LISTS = [
 	{ tag: 'twitter',        label: 'Twitter / X' }
 ];
 
+const PKG = '__PKG_NAME__';
+
+/* rule-sets belonging to a shipped preset, matched by tag OR name (covers both
+ * fresh installs and migrated configs with trailing-underscore names). */
+function presetRulesets(preset, nameRe) {
+	return uci.sections(PKG, 'ruleset')
+		.filter(function (s) { return s.preset === preset || nameRe.test(s['.name']); })
+		.map(function (s) { return s['.name']; });
+}
+function anyEnabled(names) {
+	return names.some(function (n) { return uci.get(PKG, n, 'enabled') === '1'; });
+}
+function setEnabled(names, v) {
+	names.forEach(function (n) { uci.set(PKG, n, 'enabled', v); });
+}
+
 return view.extend({
 	load: function () {
 		return Promise.all([
@@ -33,6 +49,28 @@ return view.extend({
 		m = new form.Map('__PKG_NAME__',
 			_('%s — Rules').format('__BRAND_NAME__'),
 			_('Routing mode, custom rule-sets and raw rule lines. Rule order: your "before" rules, then rule-sets (top to bottom), then community/route rules, then MATCH.'));
+
+		const ADS = presetRulesets('ads', /^ads_?$/);
+		const RU = presetRulesets('ru_unblock', /^ru_blocked_/);
+		const managed = {};
+		ADS.concat(RU).forEach(function (n) { managed[n] = true; });
+
+		/* ---------------- ready-made lists (friendly toggles) ---------------- */
+		s = m.section(form.NamedSection, 'settings', 'settings', _('Ready-made lists'),
+			_('Quick switches for the built-in lists. Fine-tune the raw providers below.'));
+		s.addremove = false;
+
+		o = s.option(form.Flag, '_preset_ads', _('Block ads'));
+		o.rmempty = false;
+		o.load = function () { return anyEnabled(ADS) ? '1' : '0'; };
+		o.write = function (sid, v) { setEnabled(ADS, v); };
+		o.remove = function () {};
+
+		o = s.option(form.Flag, '_preset_ru', _('Unblock RU-restricted resources'));
+		o.rmempty = false;
+		o.load = function () { return anyEnabled(RU) ? '1' : '0'; };
+		o.write = function (sid, v) { setEnabled(RU, v); };
+		o.remove = function () {};
 
 		/* ---------------- routing mode + inline rules (settings) ---------------- */
 		s = m.section(form.NamedSection, 'settings', 'settings', _('Routing'));
@@ -100,6 +138,8 @@ return view.extend({
 		s.anonymous = false;
 		s.nodescriptions = true;
 		s.modaltitle = _('Rule-set');
+		/* preset lists are driven by the toggles above; hide them from the raw grid */
+		s.filter = function (section_id) { return !managed[section_id]; };
 
 		o = s.option(form.Flag, 'enabled', _('Enabled'));
 		o.rmempty = false;
