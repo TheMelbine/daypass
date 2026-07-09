@@ -27,20 +27,30 @@ return view.extend({
 
 		/* ---------------- DNS ---------------- */
 		o = s.taboption('dns', form.ListValue, 'dns_type', _('DNS protocol'),
-			_('Protocol used to reach the upstream DNS server.'));
+			_('Protocol for the single DNS server below. For several resolvers use the Nameservers list instead.'));
 		o.value('udp', _('UDP (plain, unencrypted)'));
 		o.value('doh', _('DNS over HTTPS (DoH)'));
 		o.value('dot', _('DNS over TLS (DoT)'));
-		o.default = 'doh';
+		o.default = 'udp';
 		o.rmempty = false;
 
 		o = s.taboption('dns', form.Value, 'dns_server', _('DNS server'),
-			_('DoH/DoT URL or plain IP, matching the protocol above.'));
-		o.placeholder = 'https://1.1.1.1/dns-query';
+			_('Plain IP (recommended) or a DoH/DoT URL. Used when the Nameservers list is empty.'));
+		o.placeholder = '1.1.1.1';
 		o.rmempty = false;
 
+		o = s.taboption('dns', form.DynamicList, 'nameservers', _('Nameservers'),
+			_('Resolvers for normal lookups. Plain IPs are the most reliable; overrides the single DNS server above when set.'));
+		o.optional = true;
+		o.placeholder = '1.1.1.1';
+
+		o = s.taboption('dns', form.DynamicList, 'proxy_server_nameservers', _('Proxy-server nameservers'),
+			_('Resolvers used to look up your proxy/subscription server hostnames (avoids a chicken-and-egg with the proxy).'));
+		o.optional = true;
+		o.placeholder = '1.1.1.1';
+
 		o = s.taboption('dns', form.Value, 'bootstrap_dns_server', _('Bootstrap DNS server'),
-			_('Plain-IP resolver used to look up the DNS server hostname.'));
+			_('Plain-IP resolver used to look up DoH/DoT server hostnames.'));
 		o.datatype = 'ipaddr';
 		o.placeholder = '1.1.1.1';
 
@@ -87,6 +97,11 @@ return view.extend({
 
 		o = s.taboption('advanced', form.Flag, 'dont_touch_dhcp', _('Do not modify DHCP/DNS'),
 			_('Skip the dnsmasq takeover. Advanced: you must repoint client DNS to mihomo yourself.'));
+
+		o = s.taboption('advanced', form.Value, 'mihomo_gz', _('Gzipped mihomo path'),
+			_('Path to a gzipped mihomo binary to unpack to tmpfs when /usr/bin/mihomo is absent (small-flash routers). Empty uses the shipped default.'));
+		o.placeholder = '/usr/lib/__PKG_NAME__/mihomo.gz';
+		o.optional = true;
 
 		return m.render();
 	}
