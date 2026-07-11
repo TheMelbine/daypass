@@ -153,6 +153,29 @@ function parse_socks(u, name) {
 	return p;
 }
 
+function parse_http(u, name, is_tls) {
+	let p = {
+		name: name, type: 'http', server: u.host, port: as_port(u.port),
+	};
+	if (u.userinfo != null && u.userinfo != '') {
+		let ui = u.userinfo;
+		let ci = index(ui, ':');
+		if (ci >= 0) {
+			p.username = percent_decode(substr(ui, 0, ci));
+			p.password = percent_decode(substr(ui, ci + 1));
+		} else {
+			p.username = percent_decode(ui);
+		}
+	}
+	// https:// = TLS to the proxy itself; http:// = plain CONNECT (even on :443).
+	if (is_tls) {
+		p.tls = true;
+		if (u.query.sni) p.sni = u.query.sni;
+		if (u.query.insecure == '1' || u.query.allowInsecure == '1') p['skip-cert-verify'] = true;
+	}
+	return p;
+}
+
 // parse_proxy_url(url, fallback_name) -> mihomo proxy object, or null.
 function parse_proxy_url(url, fallback_name) {
 	url = trim(url);
@@ -171,6 +194,8 @@ function parse_proxy_url(url, fallback_name) {
 	case 'hy2':                   return parse_hysteria2(u, name);
 	case 'socks':
 	case 'socks5':                return parse_socks(u, name);
+	case 'http':                  return parse_http(u, name, false);
+	case 'https':                 return parse_http(u, name, true);
 	default:                      return null;
 	}
 }
