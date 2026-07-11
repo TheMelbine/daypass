@@ -30,6 +30,9 @@ const NFT_TABLE      = '__PKG_NAME__';
 const NFT_SUBNET_SET = 'subnets4';
 const NFT_LOCAL_SET  = 'localv4';
 const NFT_IFACE_SET  = 'lan_ifaces';
+// per-device full tunnel: every packet from these sources is proxied
+const NFT_FORCE_SET     = 'force4';       // by IPv4 source
+const NFT_FORCE_MAC_SET = 'force_mac';    // by MAC source (DHCP-proof)
 const TPROXY_MARK_HEX = '0x00100000';
 const TPROXY_MASK_HEX = '0x00100000';
 const BYPASS_MARK_HEX = '0x00200000';
@@ -51,6 +54,7 @@ export {
 	TPROXY_PORT, API_ADDR, API_PORT, DNS_ADDR, DNS_PORT, FAKEIP_CIDR, FAKEIP_NFT,
 	ROUTING_MARK,
 	NFT_TABLE, NFT_SUBNET_SET, NFT_LOCAL_SET, NFT_IFACE_SET,
+	NFT_FORCE_SET, NFT_FORCE_MAC_SET,
 	TPROXY_MARK_HEX, TPROXY_MASK_HEX, BYPASS_MARK_HEX, BYPASS_MASK_HEX,
 	RT_TABLE_ID, RT_RULE_PREF, LOCALV4
 };

@@ -17,6 +17,14 @@
 			"path": "__PKG_NAME__/connection"
 		}
 	},
+	"admin/services/__PKG_NAME__/devices": {
+		"title": "Devices",
+		"order": 14,
+		"action": {
+			"type": "view",
+			"path": "__PKG_NAME__/devices"
+		}
+	},
 	"admin/services/__PKG_NAME__/rules": {
 		"title": "Rules",
 		"order": 18,
