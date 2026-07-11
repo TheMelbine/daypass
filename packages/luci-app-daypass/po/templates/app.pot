@@ -10,6 +10,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
+msgid "%s — Devices"
+msgstr ""
+
 msgid "%s — Diagnostics"
 msgstr ""
 
@@ -133,6 +136,15 @@ msgstr ""
 msgid "Debug"
 msgstr ""
 
+msgid "Device"
+msgstr ""
+
+msgid "Devices"
+msgstr ""
+
+msgid "Devices via VPN"
+msgstr ""
+
 msgid "Diagnostics"
 msgstr ""
 
@@ -241,6 +253,9 @@ msgstr ""
 msgid "Hysteria2 URL must start with hysteria2:// or hy2://"
 msgstr ""
 
+msgid "IP address"
+msgstr ""
+
 msgid "Info"
 msgstr ""
 
@@ -271,10 +286,16 @@ msgstr ""
 msgid "Log level"
 msgstr ""
 
+msgid "MAC address"
+msgstr ""
+
 msgid "Monitor proxies, traffic and connections in the mihomo web dashboard."
 msgstr ""
 
 msgid "Must be an http(s) URL"
+msgstr ""
+
+msgid "Name"
 msgstr ""
 
 msgid "Nameservers"
@@ -289,6 +310,9 @@ msgstr ""
 msgid "Open dashboard"
 msgstr ""
 
+msgid "Optional. Use instead of (or with) the MAC."
+msgstr ""
+
 msgid "PROXY, DIRECT, REJECT or a proxy group name."
 msgstr ""
 
@@ -299,6 +323,9 @@ msgid "Path to a gzipped mihomo binary to unpack to tmpfs when /usr/bin/mihomo i
 msgstr ""
 
 msgid "Pick a check above."
+msgstr ""
+
+msgid "Pick a known device or type a MAC. Preferred — survives DHCP IP changes."
 msgstr ""
 
 msgid "Pick the community lists (and any custom domains/subnets) that should travel through a proxy."
@@ -350,6 +377,9 @@ msgid "Resolvers used to look up your proxy/subscription server hostnames (avoid
 msgstr ""
 
 msgid "Restart"
+msgstr ""
+
+msgid "Route every device listed here fully through the proxy, whatever it connects to. Matched by MAC (survives IP changes)."
 msgstr ""
 
 msgid "Routing"
@@ -551,6 +581,9 @@ msgid "classical"
 msgstr ""
 
 msgid "domain"
+msgstr ""
+
+msgid "e.g. PlayStation"
 msgstr ""
 
 msgid "http(s) rule-provider URL (leave empty for a local file)."

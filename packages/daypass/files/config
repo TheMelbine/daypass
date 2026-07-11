@@ -47,6 +47,14 @@ config proxy 'PROXY'
 #	option enabled '1'
 #	option url 'https://example.com/sub'
 
+# Per-device full tunnel — route ALL traffic from a device through the proxy.
+# Match by MAC (survives DHCP IP changes) and/or IP. Managed on the Devices page.
+#config device
+#	option enabled '1'
+#	option name 'PlayStation'
+#	option mac 'aa:bb:cc:dd:ee:ff'
+#	option mode 'proxy'
+
 # --- shipped rule-sets: block ads, route RU-blocked resources through PROXY ---
 
 config ruleset 'ads'

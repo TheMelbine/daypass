@@ -36,6 +36,12 @@ const callLists = rpc.declare({
 	expect: { '': {} }
 });
 
+const callLeases = rpc.declare({
+	object: 'luci.__PKG_NAME__',
+	method: 'leases',
+	expect: { '': {} }
+});
+
 const callDiag = rpc.declare({
 	object: 'luci.__PKG_NAME__',
 	method: 'diag',
@@ -96,6 +102,10 @@ return baseclass.extend({
 
 	lists: function () {
 		return callLists();
+	},
+
+	leases: function () {
+		return callLeases();
 	},
 
 	diag: function (check) {

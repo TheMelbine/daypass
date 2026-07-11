@@ -59,6 +59,25 @@ const methods = {
 		}
 	},
 
+	// leases() -> { leases: [{ mac, ip, name }] } from the dnsmasq lease file,
+	// so the Devices page can offer a dropdown of known clients.
+	leases: {
+		call: function() {
+			// read the dhcp package directly (uci_get is branded to PKG)
+			const path = sh('uci -q get dhcp.@dnsmasq[0].leasefile') || '/tmp/dhcp.leases';
+			const raw = sh(`cat '${path}' 2>/dev/null`);
+			const out = [];
+			for (let line in split(raw, '\n')) {
+				const f = split(trim(line), ' ');
+				if (length(f) < 3)
+					continue;
+				const name = (f[3] && f[3] != '*') ? f[3] : '';
+				push(out, { mac: lc(f[1]), ip: f[2], name: name });
+			}
+			return { leases: out };
+		}
+	},
+
 	// diag(check) -> { output } — whitelisted check runner
 	diag: {
 		args: { check: 'check' },

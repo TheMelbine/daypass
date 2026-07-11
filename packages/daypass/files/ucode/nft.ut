@@ -33,6 +33,32 @@ if (full) {
 	lan_mark = 'iifname ' + IF + ' ip daddr @' + C.NFT_SUBNET_SET + ' meta l4proto { tcp, udp } meta mark set ' + M + ' counter' + NL +
 		'iifname ' + IF + ' ip daddr ' + C.FAKEIP_NFT + ' meta l4proto { tcp, udp } meta mark set ' + M + ' counter';
 }
+
+// Per-device full tunnel: collect enabled `device` sections (mode != 'direct').
+// Match by MAC (DHCP-proof) and/or IPv4 source; every packet from these devices
+// is proxied regardless of destination (works in both modes; LAN-local dests
+// still bypass via the localv4 return).
+let force_macs = [];
+let force_ips = [];
+uci.foreach(C.PKG_NAME, 'device', (d) => {
+	if (d.enabled != null && d.enabled != '1') return;
+	if (d.mode == 'direct') return;
+	if (d.mac) push(force_macs, lc(trim(d.mac)));
+	if (d.ip) push(force_ips, trim(d.ip));
+});
+let force_mark = '';
+let force_mac_elem = '';
+let force_ip_elem = '';
+if (length(force_macs) > 0) {
+	force_mac_elem = 'elements = { ' + join(', ', force_macs) + ' }';
+	force_mark += 'iifname ' + IF + ' ether saddr @' + C.NFT_FORCE_MAC_SET + ' ip daddr @' + C.NFT_LOCAL_SET + ' return' + NL +
+		'iifname ' + IF + ' ether saddr @' + C.NFT_FORCE_MAC_SET + ' meta l4proto { tcp, udp } meta mark set ' + M + ' counter' + NL;
+}
+if (length(force_ips) > 0) {
+	force_ip_elem = 'elements = { ' + join(', ', force_ips) + ' }';
+	force_mark += 'iifname ' + IF + ' ip saddr @' + C.NFT_FORCE_SET + ' ip daddr @' + C.NFT_LOCAL_SET + ' return' + NL +
+		'iifname ' + IF + ' ip saddr @' + C.NFT_FORCE_SET + ' meta l4proto { tcp, udp } meta mark set ' + M + ' counter' + NL;
+}
 -%}
 table inet {{ C.NFT_TABLE }} {
 	set {{ C.NFT_LOCAL_SET }} {
@@ -53,10 +79,22 @@ table inet {{ C.NFT_TABLE }} {
 		elements = { {{ ifset }} }
 	}
 
+	set {{ C.NFT_FORCE_MAC_SET }} {
+		type ether_addr
+		{{ force_mac_elem }}
+	}
+
+	set {{ C.NFT_FORCE_SET }} {
+		type ipv4_addr
+		flags interval
+		auto-merge
+		{{ force_ip_elem }}
+	}
+
 	chain mangle {
 		type filter hook prerouting priority -150; policy accept;
 		ct status dnat return
-		{{ lan_mark }}
+		{{ force_mark }}{{ lan_mark }}
 	}
 
 	chain mangle_output {
