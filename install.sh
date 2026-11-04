@@ -4,6 +4,13 @@
 # or
 #   wget -qO /tmp/daypass-install.sh https://raw.githubusercontent.com/TheMelbine/daypass/master/install.sh && sh /tmp/daypass-install.sh
 #
+# Options (pass after the command above):
+#   --preset ru-direct   RU sites go direct, everything else through the proxy
+#   --key <link>         subscription URL or vless:// / ss:// / trojan:// link;
+#                        the service starts right away when a key is given
+# Example:
+#   sh <(wget -qO- .../install.sh) --preset ru-direct --key 'https://example.com/sub'
+#
 # Downloads the latest release (mihomo core + daypass + luci-app-daypass, matching
 # the router's architecture) and installs them. mihomo is NOT in the official
 # OpenWrt feed, so we ship it ourselves.
@@ -27,6 +34,22 @@ if [ "$PKG_IS_APK" -eq 1 ]; then EXT="apk"; else EXT="ipk"; fi
 
 msg() { echo ">>> $*"; }
 die() { echo "!!! $*" >&2; exit 1; }
+
+PRESET=""
+KEY=""
+parse_args() {
+	while [ $# -gt 0 ]; do
+		case "$1" in
+			--preset) [ $# -ge 2 ] || die "--preset needs a value"; PRESET="$2"; shift 2 ;;
+			--key)    [ $# -ge 2 ] || die "--key needs a value"; KEY="$2"; shift 2 ;;
+			*) die "Unknown option: $1 (expected --preset ru-direct, --key <link>)" ;;
+		esac
+	done
+	case "$PRESET" in
+		""|ru-direct) : ;;
+		*) die "Unknown preset: $PRESET (available: ru-direct)" ;;
+	esac
+}
 
 pkg_installed() {
 	if [ "$PKG_IS_APK" -eq 1 ]; then apk list --installed 2>/dev/null | grep -q "^$1-"; else opkg list-installed 2>/dev/null | grep -q "^$1 "; fi
@@ -173,6 +196,53 @@ install_packages() {
 	return 0
 }
 
+_ruleset() {
+	# name behavior url — a DIRECT rule-set; appended after the shipped ones so
+	# RU-blocked resources still match their PROXY rules first
+	uci -q set "${PKG}.$1=ruleset"
+	uci -q set "${PKG}.$1.enabled=1"
+	uci -q set "${PKG}.$1.behavior=$2"
+	uci -q set "${PKG}.$1.format=mrs"
+	uci -q set "${PKG}.$1.action=DIRECT"
+	uci -q set "${PKG}.$1.url=$3"
+	uci -q set "${PKG}.$1.interval=86400"
+}
+
+apply_preset() {
+	[ "$PRESET" = "ru-direct" ] || return 0
+	local base="https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo"
+	msg "Applying preset: RU direct, everything else through the proxy..."
+	uci -q set "${PKG}.settings.routing_mode=full"
+	uci -q set "${PKG}.settings.match_action=PROXY"
+	_ruleset ru_domains domain "$base/geosite/category-ru.mrs"
+	_ruleset ru_ips ipcidr "$base/geoip/ru.mrs"
+	uci -q del_list "${PKG}.settings.append_rules=DOMAIN-SUFFIX,ru,DIRECT"
+	uci -q add_list "${PKG}.settings.append_rules=DOMAIN-SUFFIX,ru,DIRECT"
+	uci -q commit "$PKG"
+}
+
+apply_key() {
+	[ -n "$KEY" ] || return 0
+	msg "Adding your key and starting ${BRAND}..."
+	case "$KEY" in
+		http://*|https://*)
+			uci -q set "${PKG}.my_sub=subscription"
+			uci -q set "${PKG}.my_sub.enabled=1"
+			uci -q set "${PKG}.my_sub.url=$KEY"
+			uci -q set "${PKG}.my_sub.user_agent=clash.meta"
+			;;
+		*://*)
+			uci -q del_list "${PKG}.PROXY.links=$KEY"
+			uci -q add_list "${PKG}.PROXY.links=$KEY"
+			;;
+		*) die "--key must be a subscription URL or a share link" ;;
+	esac
+	uci -q set "${PKG}.main.enabled=1"
+	uci -q commit "$PKG"
+	/etc/init.d/"$PKG" enable
+	/etc/init.d/"$PKG" restart || die "${BRAND} failed to start, check: logread -e ${PKG}"
+}
+
 finish() {
 	rm -rf "$DOWNLOAD_DIR"
 	msg ""
@@ -187,11 +257,14 @@ finish() {
 }
 
 main() {
+	parse_args "$@"
 	check_system
 	install_deps
 	download_release
 	install_packages
+	apply_preset
+	apply_key
 	finish
 }
 
-main
+main "$@"
