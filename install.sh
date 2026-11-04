@@ -148,7 +148,7 @@ install_packages() {
 	local f
 	for pat in "$MIHOMO_VARIANT" "${PKG}" "luci-app-${PKG}"; do
 		f=$(ls "$DOWNLOAD_DIR"/${pat}[_-]*."$EXT" 2>/dev/null | head -1)
-		[ -n "$f" ] || { [ "$pat" = "$MIHOMO_VARIANT" ] && die "$MIHOMO_VARIANT package missing from release"; continue; }
+		[ -n "$f" ] || die "$pat package missing from release (download failed?)"
 		msg "Installing $(basename "$f")..."
 		pkg_install_file "$f" || die "install failed: $(basename "$f")"
 	done
@@ -159,22 +159,29 @@ install_packages() {
 		uci -q commit "${PKG}"
 	fi
 
-	# optional Russian LuCI translation
+	# Russian LuCI translation: tiny, and LuCI only uses it for a Russian UI, so
+	# install it unconditionally — the installer must run without any prompts.
 	local ru
 	ru=$(ls "$DOWNLOAD_DIR"/luci-i18n-${PKG}-ru*."$EXT" 2>/dev/null | head -1)
 	if [ -n "$ru" ]; then
-		printf ">>> Install Russian LuCI translation? [y/N] "
-		read -r ans
-		case "$ans" in y|Y) pkg_install_file "$ru" || true ;; esac
+		pkg_install_file "$ru" || msg "Russian translation failed to install, skipping."
 	fi
+
+	# Pick up the new rpcd methods and menu on upgrades, without a reboot.
+	rm -f /tmp/luci-indexcache* /var/luci-indexcache*
+	[ -x /etc/init.d/rpcd ] && /etc/init.d/rpcd restart
+	return 0
 }
 
 finish() {
 	rm -rf "$DOWNLOAD_DIR"
 	msg ""
 	msg "${BRAND} installed."
-	msg "1) Open LuCI -> Services -> ${BRAND}, paste your vless:// / ss:// / trojan:// link,"
-	msg "   pick the lists to route, and enable the service."
+	local ip
+	ip=$(uci -q get network.lan.ipaddr)
+	ip=${ip%%/*}
+	msg "1) Open http://${ip:-<router-ip>}/${PKG}/ or LuCI -> Services -> ${BRAND},"
+	msg "   paste your vless:// / ss:// / trojan:// link, pick the lists to route, and enable the service."
 	msg "2) Or via CLI: edit /etc/config/${PKG}, then: /etc/init.d/${PKG} enable && /etc/init.d/${PKG} start"
 	msg ""
 }
