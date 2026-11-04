@@ -8,6 +8,9 @@
 #   --preset ru-direct   RU sites go direct, everything else through the proxy
 #   --key <link>         subscription URL or vless:// / ss:// / trojan:// link;
 #                        the service starts right away when a key is given
+#   --update             update an installed router: keeps its config, skips the
+#                        download when already on the latest release
+#   --force              with --update: reinstall even when up to date
 # Example:
 #   sh <(wget -qO- .../install.sh) --preset ru-direct --key 'https://example.com/sub'
 #
@@ -37,12 +40,17 @@ die() { echo "!!! $*" >&2; exit 1; }
 
 PRESET=""
 KEY=""
+UPDATE=0
+FORCE=0
+RELEASE_FILE="/etc/${PKG}/release"
 parse_args() {
 	while [ $# -gt 0 ]; do
 		case "$1" in
 			--preset) [ $# -ge 2 ] || die "--preset needs a value"; PRESET="$2"; shift 2 ;;
 			--key)    [ $# -ge 2 ] || die "--key needs a value"; KEY="$2"; shift 2 ;;
-			*) die "Unknown option: $1 (expected --preset ru-direct, --key <link>)" ;;
+			--update) UPDATE=1; shift ;;
+			--force)  FORCE=1; shift ;;
+			*) die "Unknown option: $1 (expected --preset ru-direct, --key <link>, --update, --force)" ;;
 		esac
 	done
 	case "$PRESET" in
@@ -53,6 +61,13 @@ parse_args() {
 
 pkg_installed() {
 	if [ "$PKG_IS_APK" -eq 1 ]; then apk list --installed 2>/dev/null | grep -q "^$1-"; else opkg list-installed 2>/dev/null | grep -q "^$1 "; fi
+}
+pkg_version() {
+	if [ "$PKG_IS_APK" -eq 1 ]; then
+		apk list --installed 2>/dev/null | sed -n "s/^$1-\([0-9][^ ]*\) .*/\1/p" | head -1
+	else
+		opkg list-installed 2>/dev/null | awk -v p="$1" '$1 == p {print $3; exit}'
+	fi
 }
 pkg_update() {
 	if [ "$PKG_IS_APK" -eq 1 ]; then apk update; else opkg update; fi
@@ -83,6 +98,16 @@ check_system() {
 	# flash space. The full mihomo binary is ~43MB unpacked; on tight flash we
 	# install the gzipped package (~16MB) and unpack to tmpfs at runtime instead.
 	space=$(df /overlay 2>/dev/null | awk 'NR==2 {print $4}')
+
+	# An update keeps the installed mihomo flavour and needs no fresh space for it.
+	if [ "$UPDATE" -eq 1 ]; then
+		pkg_installed "$PKG" || die "${BRAND} is not installed, run without --update."
+		MIHOMO_VARIANT=mihomo
+		pkg_installed mihomo-gz && MIHOMO_VARIANT=mihomo-gz
+		nslookup openwrt.org >/dev/null 2>&1 || die "DNS is not working — fix connectivity first."
+		return 0
+	fi
+
 	if [ -n "$space" ] && [ "$space" -lt 20480 ]; then
 		die "Not enough free space on /overlay: $((space/1024))MB (need ~20MB)."
 	fi
@@ -129,6 +154,14 @@ download_release() {
 	[ -n "$body" ] || die "Could not fetch release info from GitHub (is the repo public / are you rate-limited?)."
 	echo "$body" | grep -q '"message": *"Not Found"' && die "No published release yet for ${GH_OWNER}/${GH_REPO}."
 
+	# Tag, not package version: same-day releases share a package version.
+	TAG=$(echo "$body" | grep -o '"tag_name": *"[^"]*"' | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
+	if [ "$UPDATE" -eq 1 ] && [ "$FORCE" -eq 0 ] && [ -n "$TAG" ] && \
+		[ "$(cat "$RELEASE_FILE" 2>/dev/null)" = "$TAG" ]; then
+		msg "Already on the latest release ($TAG)."
+		exit 0
+	fi
+
 	# asset URLs for our format
 	local urls
 	urls=$(echo "$body" | grep -o "https://[^\"[:space:]]*\\.${EXT}")
@@ -172,6 +205,12 @@ install_packages() {
 	for pat in "$MIHOMO_VARIANT" "${PKG}" "luci-app-${PKG}"; do
 		f=$(ls "$DOWNLOAD_DIR"/${pat}[_-]*."$EXT" 2>/dev/null | head -1)
 		[ -n "$f" ] || die "$pat package missing from release (download failed?)"
+		# don't reinstall an unchanged core: it would stop traffic for nothing
+		if [ "$UPDATE" -eq 1 ] && [ "$pat" = "$MIHOMO_VARIANT" ]; then
+			case "$(basename "$f")" in
+				*"$(pkg_version "$pat")"*) msg "$pat is up to date."; continue ;;
+			esac
+		fi
 		msg "Installing $(basename "$f")..."
 		pkg_install_file "$f" || die "install failed: $(basename "$f")"
 	done
@@ -193,6 +232,14 @@ install_packages() {
 	# Pick up the new rpcd methods and menu on upgrades, without a reboot.
 	rm -f /tmp/luci-indexcache* /var/luci-indexcache*
 	[ -x /etc/init.d/rpcd ] && /etc/init.d/rpcd restart
+
+	[ -n "${TAG:-}" ] && echo "$TAG" > "$RELEASE_FILE"
+
+	# Reinstalling stops the service; bring it back if it was switched on.
+	if [ "$UPDATE" -eq 1 ] && [ "$(uci -q get "${PKG}.main.enabled")" = "1" ]; then
+		msg "Restarting ${BRAND}..."
+		/etc/init.d/"$PKG" restart || die "${BRAND} failed to start, check: logread -e ${PKG}"
+	fi
 	return 0
 }
 
@@ -245,6 +292,10 @@ apply_key() {
 
 finish() {
 	rm -rf "$DOWNLOAD_DIR"
+	if [ "$UPDATE" -eq 1 ]; then
+		msg "${BRAND} updated to ${TAG:-latest}. Refresh the panel with Ctrl+F5."
+		return 0
+	fi
 	msg ""
 	msg "${BRAND} installed."
 	local ip

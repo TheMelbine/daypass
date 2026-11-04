@@ -14,6 +14,25 @@
 # shellcheck source=/dev/null
 . /usr/lib/__PKG_NAME__/account.sh
 
+# --- self-update: runs the current installer from the project repo ---
+cmd_update() {
+	local repo script
+	case "$BRAND_URL" in
+		https://github.com/*) repo="${BRAND_URL#https://github.com/}" ;;
+		*) echo "update: this build has no public update channel" >&2; return 1 ;;
+	esac
+	script="/tmp/${PKG_NAME}-update.sh"
+	# the query string skips the raw.githubusercontent.com CDN cache
+	curl -fsSL -o "$script" "https://raw.githubusercontent.com/${repo}/master/install.sh?t=$(date +%s)" || {
+		echo "update: could not download the installer" >&2
+		return 1
+	}
+	sh "$script" --update ${1:+"$1"}
+	local rc=$?
+	rm -f "$script"
+	return $rc
+}
+
 # --- mihomo binary resolution ---
 cmd_mihomo_path() {
 	mihomo_bin || { log "mihomo binary not found (install mihomo or set ${PKG_NAME}.main.mihomo_gz)"; return 1; }
@@ -109,13 +128,14 @@ case "$1" in
 	status)        cmd_status ;;
 	safe_paths)    safe_paths ;;
 	selftest)      cmd_selftest ;;
+	update)         cmd_update "$2" ;;
 	account_link)   cmd_account_link ;;
 	account_login)  cmd_account_login "$2" ;;
 	account_sync)   cmd_account_sync ;;
 	account_status) cmd_account_status ;;
 	account_logout) cmd_account_logout ;;
 	*)
-		echo "usage: ${PKG_NAME} {generate|check|mihomo_path|safe_paths|fw_start|fw_stop|dns_takeover|dns_restore|list_update|lists|status|selftest|account_link|account_login|account_sync|account_status|account_logout}" >&2
+		echo "usage: ${PKG_NAME} {generate|check|mihomo_path|safe_paths|fw_start|fw_stop|dns_takeover|dns_restore|list_update|lists|status|selftest|update|account_link|account_login|account_sync|account_status|account_logout}" >&2
 		exit 1
 		;;
 esac
