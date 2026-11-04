@@ -1,10 +1,9 @@
 name: build
 
 # Compiles the .ipk on top of the pre-baked daypass-sdk image (see sdk-image.yml
-# / docker/Dockerfile.sdk). Runs on the self-hosted ffm runner: plain `docker
-# build` on the host daemon so the baked SDK image and build layers persist on
-# disk between runs — the ~2 GB image is pulled once, then rebuilds are fast (no
-# pull, no feeds clone). Triggered on release tags or on demand.
+# / docker/Dockerfile.sdk). Runs on GitHub-hosted runners: this repo is public,
+# so a self-hosted runner would expose its host to code from fork PRs.
+# Triggered on release tags or on demand.
 on:
   workflow_dispatch:
   push:
@@ -17,7 +16,7 @@ permissions:
 jobs:
   packages:
     name: aarch64_cortex-a53 · openwrt-24.10
-    runs-on: [ self-hosted, ffm ]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -30,8 +29,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Plain docker build on the host daemon — reuses the host's image store and
-      # layer cache across runs (the win of a persistent self-hosted runner).
       - name: Compile packages (pre-baked SDK)
         run: |
           docker build \
