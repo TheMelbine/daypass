@@ -1,2 +1,6 @@
 /etc/config/__PKG_NAME__
 /etc/__PKG_NAME__/providers
+/etc/__PKG_NAME__/account.cookies
+/etc/__PKG_NAME__/account.json
+/etc/__PKG_NAME__/account-config.json
+/etc/__PKG_NAME__/account-links.lst

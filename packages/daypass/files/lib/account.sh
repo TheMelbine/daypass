@@ -60,7 +60,7 @@ cmd_account_login() {
 	http="$(_account_curl -o "${ACCOUNT_RAW}.login" -w '%{http_code}' \
 		-X POST --data "$body" "${ACCOUNT_API}/api/v1/auth/login")"
 	if [ "$http" != "200" ]; then
-		detail="$(jsonfilter -i "${ACCOUNT_RAW}.login" -e '@.detail' 2>/dev/null | head -c 200)"
+		detail="$(jsonfilter -i "${ACCOUNT_RAW}.login" -e '@.detail' 2>/dev/null | tr -d '"\\\n' | head -c 200)"
 		rm -f "${ACCOUNT_RAW}.login"
 		printf '{"error":"login_failed","http":"%s","detail":"%s"}\n' "$http" "$detail"
 		return 1
@@ -120,7 +120,7 @@ cmd_account_sync() {
 		uci -q batch <<-EOF
 			set ${PKG_NAME}.${ACCOUNT_SECTION}=subscription
 			set ${PKG_NAME}.${ACCOUNT_SECTION}.enabled=1
-			set ${PKG_NAME}.${ACCOUNT_SECTION}.url=${sub_url}
+			set ${PKG_NAME}.${ACCOUNT_SECTION}.url='${sub_url}'
 			set ${PKG_NAME}.${ACCOUNT_SECTION}.user_agent=clash.meta
 			commit ${PKG_NAME}
 		EOF
