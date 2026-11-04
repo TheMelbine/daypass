@@ -6,6 +6,8 @@ config __PKG_NAME__ 'main'
 	# Path to a gzipped mihomo binary to unpack to tmpfs when /usr/bin/mihomo is
 	# absent (small-flash routers). Empty = /usr/lib/__PKG_NAME__/mihomo.gz.
 	option mihomo_gz ''
+	# Simple UI by default: only the Home page. '1' reveals the advanced tabs.
+	option advanced_ui '0'
 
 config settings 'settings'
 	option dns_type 'udp'

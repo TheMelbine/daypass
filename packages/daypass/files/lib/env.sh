@@ -10,6 +10,12 @@ PKG_VERSION="__PKG_VERSION__"
 BRAND_URL="__BRAND_URL__"
 LISTS_BASE="__LISTS_BASE__"
 
+# Provider account API (login via the provider's Telegram bot). Empty API URL
+# disables the whole account feature — the open-source brand ships it empty.
+ACCOUNT_API="__ACCOUNT_API__"
+ACCOUNT_BOT="__ACCOUNT_BOT__"
+ACCOUNT_PLATFORM="__ACCOUNT_PLATFORM__"
+
 # Base for community subnet (.lst IPv4) lists. Domains come from LISTS_BASE as
 # <tag>_domain.mrs; subnets come from here as <tag>.lst. A mirror brand can
 # override both by shipping its own env.sh values.

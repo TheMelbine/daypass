@@ -143,6 +143,39 @@ const methods = {
 		}
 	},
 
+	// account_status() -> { enabled, bot_url, logged_in, has_subscription, synced_at }
+	account_status: {
+		call: function() {
+			return parse_json(sh(`${PKG} account_status 2>/dev/null`)) ?? { enabled: false };
+		}
+	},
+
+	// account_login(code) -> { ok } | { error } — one-time code from the provider bot
+	account_login: {
+		args: { code: 'code' },
+		call: function(req) {
+			// the CLI re-sanitizes; strip quotes here so the shell arg stays intact
+			const code = replace('' + (req.args?.code ?? ''), /[^A-Za-z0-9_-]/g, '');
+			if (code == '')
+				return { error: 'code required' };
+			return parse_json(sh(`${PKG} account_login '${code}' 2>/dev/null`)) ?? { error: 'internal' };
+		}
+	},
+
+	// account_sync() -> re-pull the subscription from the provider
+	account_sync: {
+		call: function() {
+			return parse_json(sh(`${PKG} account_sync 2>/dev/null`)) ?? { error: 'internal' };
+		}
+	},
+
+	// account_logout() -> { ok }
+	account_logout: {
+		call: function() {
+			return parse_json(sh(`${PKG} account_logout 2>/dev/null`)) ?? { error: 'internal' };
+		}
+	},
+
 	// dashboard_info() -> { https, port, ui_name, secret } for the client URL builder
 	dashboard_info: {
 		call: function() {

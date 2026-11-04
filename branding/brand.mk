@@ -25,12 +25,16 @@ BRAND_URL     ?= https://github.com/you/daypass
 BRAND_SUPPORT ?= https://github.com/you/daypass/issues
 BRAND_DOCS    ?= https://github.com/you/daypass#readme
 BRAND_LISTS   ?= https://github.com/itdoginfo/allow-domains/releases/latest/download
-BRAND_ACCENT  ?= #2e7d32
+BRAND_ACCENT  ?= \#2e7d32
 BRAND_DASHBOARD ?= zashboard
 BRAND_LICENSE ?= GPL-3.0-or-later
 BRAND_MAINTAINER ?= daypass <noreply@example.com>
 BRAND_CONFLICTS ?=
 BRAND_LOGO    ?= $(BRAND_DIR)logo/daypass.svg
+# Provider account (login via the provider's Telegram bot). Empty API = feature off.
+BRAND_ACCOUNT_API      ?=
+BRAND_ACCOUNT_BOT      ?=
+BRAND_ACCOUNT_PLATFORM ?=
 
 # Version: digit-led (apk requires it; ipk tolerates anything). Never 'v'-prefix.
 DAYPASS_VERSION ?=
@@ -51,5 +55,8 @@ define Brand/Subst
 		-e 's|__LISTS_BASE__|$(BRAND_LISTS)|g' \
 		-e 's|__ACCENT__|$(BRAND_ACCENT)|g' \
 		-e 's|__DASHBOARD__|$(BRAND_DASHBOARD)|g' \
+		-e 's|__ACCOUNT_API__|$(BRAND_ACCOUNT_API)|g' \
+		-e 's|__ACCOUNT_BOT__|$(BRAND_ACCOUNT_BOT)|g' \
+		-e 's|__ACCOUNT_PLATFORM__|$(BRAND_ACCOUNT_PLATFORM)|g' \
 		{} +
 endef

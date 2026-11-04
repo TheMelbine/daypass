@@ -90,8 +90,9 @@ uci.foreach(C.PKG_NAME, 'proxy', (s) => {
 	}
 	if (uci_bool(s.include_direct)) push(members, 'DIRECT');
 
-	// subscriptions this group draws from
-	let uses = uci_array(s.subscriptions);
+	// subscriptions this group draws from; drop references to subscriptions
+	// that are disabled or deleted (a dangling name is a mihomo fatal)
+	let uses = filter(uci_array(s.subscriptions), (n) => exists(proxy_providers, n));
 
 	// Zero-config default: a group that doesn't explicitly restrict its
 	// subscriptions draws from every enabled one. This way adding a subscription

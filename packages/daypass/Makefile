@@ -60,11 +60,16 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DATA) ./files/lib/dnsmasq.sh      $(1)/usr/lib/$(BRAND_PKG)/dnsmasq.sh
 	$(INSTALL_DATA) ./files/lib/nftset.sh       $(1)/usr/lib/$(BRAND_PKG)/nftset.sh
 	$(INSTALL_DATA) ./files/lib/list-update.sh  $(1)/usr/lib/$(BRAND_PKG)/list-update.sh
+	$(INSTALL_DATA) ./files/lib/account.sh      $(1)/usr/lib/$(BRAND_PKG)/account.sh
 
 	# ucode generator + nft template + catalog
 	$(INSTALL_DIR) $(1)/usr/share/$(BRAND_PKG)/ucode
 	$(INSTALL_DATA) ./files/ucode/constants.uc  $(1)/usr/share/$(BRAND_PKG)/ucode/constants.uc
 	$(INSTALL_DATA) ./files/ucode/lib.uc        $(1)/usr/share/$(BRAND_PKG)/ucode/lib.uc
+	$(INSTALL_DATA) ./files/ucode/account-links.uc $(1)/usr/share/$(BRAND_PKG)/ucode/account-links.uc
+	# Standalone web panel (LuCI-free; talks to rpcd over /ubus)
+	$(INSTALL_DIR) $(1)/www/$(BRAND_PKG)
+	$(INSTALL_DATA) ./files/web/index.html $(1)/www/$(BRAND_PKG)/index.html
 	$(INSTALL_DATA) ./files/ucode/outbound.uc   $(1)/usr/share/$(BRAND_PKG)/ucode/outbound.uc
 	$(INSTALL_DATA) ./files/ucode/generate.uc   $(1)/usr/share/$(BRAND_PKG)/ucode/generate.uc
 	$(INSTALL_DATA) ./files/ucode/nft.ut        $(1)/usr/share/$(BRAND_PKG)/ucode/nft.ut

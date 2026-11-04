@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__BRAND_NAME__</title>
+<style>
+  :root {
+    --ground:#f4f3f7; --surface:#fff; --surface2:#edecf2; --ink:#232130; --muted:#6d6a7c;
+    --line:#dddbe6; --accent:__ACCENT__; --accent-ink:#fff; --accent-soft:__ACCENT__1a;
+    --crit:#b3372b; --ok:#2e9e44; --r:10px;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ground:#17161c; --surface:#201f28; --surface2:#2a2933; --ink:#e8e6f0;
+      --muted:#928fa1; --line:#37353f; --accent-soft:__ACCENT__33; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink);
+    font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:720px; margin:0 auto; padding:20px 16px 60px; }
+  header { display:flex; align-items:center; gap:10px; padding:2px 0 18px; }
+  .logo { width:28px; height:28px; border-radius:8px; background:var(--accent); display:grid; place-items:center; }
+  .logo svg { width:18px; height:18px; }
+  .wordmark { font-size:18px; font-weight:700; }
+  .wordmark small { color:var(--muted); font-weight:500; font-size:11px; margin-left:6px; }
+  header .sp { flex:1; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:18px 20px; margin-bottom:14px; box-shadow:0 1px 3px rgb(0 0 0 / .05); }
+  h2 { font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);
+    margin:0 0 10px; font-weight:700; }
+  h1 { font-size:20px; margin:0 0 6px; }
+  p.mut { color:var(--muted); margin:4px 0 14px; }
+  button, .btn { font:600 15px/1.3 system-ui,sans-serif; border:none; border-radius:var(--r);
+    padding:10px 18px; cursor:pointer; background:var(--surface2); color:var(--ink); }
+  button.primary { background:var(--accent); color:var(--accent-ink); }
+  button.big { font-size:17px; padding:12px 26px; }
+  button:disabled { opacity:.5; cursor:default; }
+  input, select { font:15px/1.4 system-ui,sans-serif; color:var(--ink); background:var(--surface2);
+    border:1px solid var(--line); border-radius:var(--r); padding:9px 12px; max-width:100%; }
+  input:focus-visible, select:focus-visible, button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .code { font-family:var(--mono); font-size:21px; letter-spacing:.25em; text-align:center; width:200px; }
+  .row { display:flex; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--line); }
+  .row:first-of-type { border-top:none; }
+  .row .grow { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .row .sub { display:block; font-size:12px; color:var(--muted); font-family:var(--mono);
+    overflow:hidden; text-overflow:ellipsis; }
+  .dot { display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:8px; }
+  .chip { font-family:var(--mono); font-size:11px; font-weight:600; padding:2px 8px;
+    border-radius:999px; background:var(--accent-soft); color:var(--accent); flex:none; }
+  .tgl { flex:none; width:40px; height:23px; border-radius:999px; padding:0; position:relative;
+    background:var(--surface2); transition:background .15s; border:1px solid var(--line); }
+  .tgl::after { content:""; position:absolute; top:2px; left:2px; width:17px; height:17px;
+    border-radius:50%; background:var(--surface); box-shadow:0 1px 2px rgb(0 0 0 / .3); transition:left .15s; }
+  .tgl[aria-checked="true"] { background:var(--accent); border-color:var(--accent); }
+  .tgl[aria-checked="true"]::after { left:19px; }
+  @media (prefers-reduced-motion: reduce) { .tgl, .tgl::after { transition:none; } }
+  .hero { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  ol.steps { line-height:2.1; margin:0 0 14px; padding-left:20px; }
+  .center { display:flex; flex-direction:column; gap:10px; align-items:center; }
+  .adv-gate { text-align:center; color:var(--muted); font-size:13px; padding:6px 0 10px; }
+  .adv-gate label { cursor:pointer; display:inline-flex; gap:6px; align-items:center; }
+  pre { background:var(--surface2); border-radius:var(--r); padding:12px; font:12px/1.5 var(--mono);
+    overflow-x:auto; white-space:pre-wrap; max-height:300px; overflow-y:auto; }
+  .links a { color:var(--accent); font-size:13px; margin-right:16px; }
+  .toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--ink);
+    color:var(--ground); padding:10px 18px; border-radius:10px; font-size:14px; opacity:0;
+    transition:opacity .2s; pointer-events:none; max-width:90vw; }
+  .toast.show { opacity:1; }
+  .hidden { display:none !important; }
+  footer { color:var(--muted); font:12px var(--mono); display:flex; gap:18px; flex-wrap:wrap; padding-top:16px; }
+  footer a { color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 24.5l6.2 6.2L34 18" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="wordmark">__BRAND_NAME__ <small id="verline"></small></div>
+    <div class="sp"></div>
+    <button id="logoutRouterBtn" class="hidden" title="Выйти из панели">Выход</button>
+  </header>
+
+  <!-- =================== router login =================== -->
+  <div id="authView" class="card hidden">
+    <h1>Вход в панель роутера</h1>
+    <p class="mut">Пароль администратора роутера (тот же, что был в LuCI).</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <input id="pw" type="password" placeholder="Пароль" autocomplete="current-password" style="flex:1; min-width:180px;">
+      <button id="loginBtn" class="primary">Войти</button>
+    </div>
+    <p id="authErr" class="mut" style="color:var(--crit);"></p>
+  </div>
+
+  <!-- =================== account (babushka) =================== -->
+  <div id="acctView" class="card hidden">
+    <h1>Подключите аккаунт __BRAND_NAME__</h1>
+    <p class="mut">Один раз — дальше всё работает само.</p>
+    <ol class="steps">
+      <li>Откройте <a id="botLink" href="#" target="_blank" rel="noreferrer"><b>нашего Telegram-бота</b></a> и нажмите «Начать»</li>
+      <li>Бот пришлёт код для входа</li>
+      <li>Введите код сюда:</li>
+    </ol>
+    <div class="center">
+      <input id="otp" class="code" inputmode="numeric" autocomplete="one-time-code" placeholder="······">
+      <button id="otpBtn" class="primary big" style="width:220px;">Войти</button>
+    </div>
+  </div>
+
+  <!-- =================== main state =================== -->
+  <div id="mainView" class="hidden">
+    <div class="card">
+      <div class="hero">
+        <div>
+          <h1><span class="dot" id="stateDot"></span><span id="stateTitle">…</span></h1>
+          <p class="mut" id="stateSub" style="margin:2px 0 0;"></p>
+        </div>
+        <button id="powerBtn" class="big">…</button>
+      </div>
+      <div id="nodeRow" class="hidden" style="margin-top:16px; padding-top:14px; border-top:1px solid var(--line);">
+        <label class="mut" style="font-size:13px; display:block; margin-bottom:6px;">Сервер (смените, если медленно):</label>
+        <select id="nodeSel"></select>
+      </div>
+      <div id="acctLine" class="links hidden" style="margin-top:14px;">
+        <a href="#" id="syncLink">Обновить подписку</a>
+        <a href="#" id="acctLogoutLink">Выйти из аккаунта</a>
+      </div>
+    </div>
+
+    <div class="adv-gate">
+      <label><input type="checkbox" id="advCb"> Расширенные настройки (для опытных)</label>
+    </div>
+
+    <!-- =================== advanced =================== -->
+    <div id="advView" class="hidden">
+      <div class="card"><h2>Маршруты и списки</h2><div id="rulesList"></div></div>
+      <div class="card"><h2>Подписки</h2><div id="subsList"></div>
+        <div class="row" style="border-top:1px solid var(--line);">
+          <input id="subUrl" placeholder="https://… ссылка подписки или vless://…" style="flex:1; font-family:var(--mono); font-size:13px;">
+          <button id="subAdd" class="primary">Добавить</button>
+        </div>
+      </div>
+      <div class="card"><h2>Устройства — весь трафик через VPN</h2><div id="devList"></div>
+        <div class="row" style="border-top:1px solid var(--line);">
+          <input id="devMac" placeholder="MAC (aa:bb:…) или IP" style="flex:1; font-family:var(--mono); font-size:13px;">
+          <input id="devName" placeholder="Имя" style="width:120px;">
+          <button id="devAdd" class="primary">Добавить</button>
+        </div>
+      </div>
+      <div class="card"><h2>Диагностика</h2>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+          <button id="diagBtn">Проверить всё</button>
+          <button id="logsBtn">Журнал ядра</button>
+          <a id="dashLink" class="btn" href="#" target="_blank" rel="noreferrer" style="text-decoration:none; display:inline-block;">Zashboard ↗</a>
+        </div>
+        <pre id="diagOut" class="hidden"></pre>
+      </div>
+    </div>
+
+    <footer>
+      <span id="coreline"></span>
+      <span>tproxy :7894 · dns 127.0.0.42</span>
+    </footer>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* Standalone control panel: talks JSON-RPC to /ubus (rpcd). The luci.__PKG_NAME__
+ * rpcd plugin is the whole backend; the mihomo API secret never reaches the page. */
+const PKG = '__PKG_NAME__';
+const NULLSID = '00000000000000000000000000000000';
+let SID = sessionStorage.getItem('sid') || null;
+let RPCID = 1;
+
+const $ = (id) => document.getElementById(id);
+function toast(msg) {
+	const t = $('toast');
+	t.textContent = msg; t.classList.add('show');
+	clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function ubus(object, method, params) {
+	const res = await fetch('/ubus', {
+		method: 'POST', headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ jsonrpc: '2.0', id: RPCID++, method: 'call',
+			params: [SID || NULLSID, object, method, params || {}] })
+	});
+	const data = await res.json();
+	if (data.error) throw new Error('rpc: ' + (data.error.message || data.error.code));
+	const code = data.result[0];
+	if (code === 6) { throw new Error('denied'); }
+	if (code !== 0 && code !== undefined) throw new Error('ubus code ' + code);
+	return data.result[1] || {};
+}
+
+const call = (m, p) => ubus('luci.' + PKG, m, p);
+
+/* ---------- router auth ---------- */
+async function routerLogin(pw) {
+	SID = null;
+	const r = await ubus('session', 'login', { username: 'root', password: pw, timeout: 3600 });
+	SID = r.ubus_rpc_session;
+	sessionStorage.setItem('sid', SID);
+}
+async function sessionAlive() {
+	if (!SID) return false;
+	try { await ubus('session', 'access', {}); return true; }
+	catch (e) { SID = null; sessionStorage.removeItem('sid'); return false; }
+}
+
+/* ---------- uci helpers ---------- */
+const uciGetAll = () => ubus('uci', 'get', { config: PKG }).then(r => r.values || {});
+async function uciSet(section, values) {
+	await ubus('uci', 'set', { config: PKG, section: section, values: values });
+	await ubus('uci', 'commit', { config: PKG });
+}
+async function uciAdd(type, values) {
+	const r = await ubus('uci', 'add', { config: PKG, type: type, values: values });
+	await ubus('uci', 'commit', { config: PKG });
+	return r.section;
+}
+async function uciDel(section) {
+	await ubus('uci', 'delete', { config: PKG, section: section });
+	await ubus('uci', 'commit', { config: PKG });
+}
+const svc = (action) => ubus('rc', 'init', { name: PKG, action: action });
+
+/* ---------- state ---------- */
+let CFG = {}, ACCT = { enabled: false }, RUNNING = false, GROUP = null, GROUP_NAME = 'PROXY';
+
+function firstSection(type) {
+	for (const k in CFG) if (CFG[k]['.type'] === type) return k;
+	return null;
+}
+function sectionsOf(type) {
+	return Object.keys(CFG).filter(k => CFG[k]['.type'] === type)
+		.sort((a, b) => (CFG[a]['.index'] || 0) - (CFG[b]['.index'] || 0));
+}
+
+async function refresh() {
+	CFG = await uciGetAll();
+	GROUP_NAME = firstSection('proxy') || 'PROXY';
+	ACCT = await call('account_status').catch(() => ({ enabled: false }));
+	const ver = await call('api', { method: 'GET', path: '/version', query: '', body: '' }).catch(() => null);
+	RUNNING = !!(ver && ver.version);
+	GROUP = RUNNING ? await call('api', { method: 'GET', path: '/proxies/' + GROUP_NAME, query: '', body: '' }).catch(() => null) : null;
+	const v = await call('version').catch(() => ({}));
+	$('verline').textContent = location.hostname;
+	$('coreline').textContent = (v.core ? 'mihomo ' + v.core : '') + (v.app ? ' · ' + v.app : '');
+	render();
+}
+
+/* ---------- render ---------- */
+function render() {
+	$('authView').classList.add('hidden');
+	const needAcct = ACCT.enabled && !ACCT.logged_in;
+	$('acctView').classList.toggle('hidden', !needAcct);
+	$('mainView').classList.toggle('hidden', needAcct);
+	$('logoutRouterBtn').classList.remove('hidden');
+	if (needAcct) { $('botLink').href = ACCT.bot_url; return; }
+
+	$('stateDot').style.background = RUNNING ? 'var(--ok)' : 'var(--crit)';
+	$('stateTitle').textContent = RUNNING ? 'VPN работает' : 'VPN выключен';
+	$('stateSub').textContent = RUNNING
+		? 'Заблокированные сайты и приложения открываются сами.'
+		: 'Включите — и заблокированные сайты снова будут открываться.';
+	const pb = $('powerBtn');
+	pb.textContent = RUNNING ? 'Выключить' : 'Включить';
+	pb.className = RUNNING ? 'big' : 'primary big';
+
+	const nr = $('nodeRow'), sel = $('nodeSel');
+	if (RUNNING && GROUP && Array.isArray(GROUP.all) && GROUP.all.length) {
+		nr.classList.remove('hidden');
+		sel.innerHTML = '';
+		GROUP.all.forEach(n => {
+			const o = document.createElement('option');
+			o.value = n; o.textContent = n; o.selected = (n === GROUP.now);
+			sel.appendChild(o);
+		});
+	} else nr.classList.add('hidden');
+
+	$('acctLine').classList.toggle('hidden', !ACCT.enabled);
+	renderAdvanced();
+}
+
+function rowEl(html) { const d = document.createElement('div'); d.className = 'row'; d.innerHTML = html; return d; }
+function tglEl(on, fn) {
+	const b = document.createElement('button');
+	b.className = 'tgl'; b.setAttribute('role', 'switch'); b.setAttribute('aria-checked', on ? 'true' : 'false');
+	b.addEventListener('click', async () => {
+		const next = b.getAttribute('aria-checked') !== 'true';
+		b.setAttribute('aria-checked', next ? 'true' : 'false');
+		try { await fn(next); toast('Сохранено'); svc('reload'); }
+		catch (e) { toast('Ошибка: ' + e.message); }
+	});
+	return b;
+}
+
+function renderAdvanced() {
+	/* rules: shipped + custom rulesets with enable toggles */
+	const rl = $('rulesList'); rl.innerHTML = '';
+	sectionsOf('ruleset').forEach(name => {
+		const s = CFG[name];
+		const r = rowEl(`<div class="grow">${name.replace(/_$/, '')}<span class="sub">${s.action || ''} · ${(s.url || '').split('/').pop()}</span></div><span class="chip">${s.action || '?'}</span>`);
+		r.appendChild(tglEl(s.enabled !== '0', (on) => uciSet(name, { enabled: on ? '1' : '0' })));
+		rl.appendChild(r);
+	});
+
+	/* subscriptions */
+	const sl = $('subsList'); sl.innerHTML = '';
+	sectionsOf('subscription').forEach(name => {
+		const s = CFG[name];
+		let host = ''; try { host = new URL(s.url).host; } catch (e) {}
+		const r = rowEl(`<div class="grow">${name}<span class="sub">${host}</span></div>`);
+		r.appendChild(tglEl(s.enabled !== '0', (on) => uciSet(name, { enabled: on ? '1' : '0' })));
+		sl.appendChild(r);
+	});
+
+	/* devices */
+	const dl = $('devList'); dl.innerHTML = '';
+	sectionsOf('device').forEach(name => {
+		const s = CFG[name];
+		const r = rowEl(`<div class="grow">${s.name || name}<span class="sub">${s.mac || s.ip || ''}</span></div>`);
+		const del = document.createElement('button');
+		del.textContent = '✕'; del.title = 'Удалить'; del.style.padding = '6px 10px';
+		del.addEventListener('click', async () => {
+			await uciDel(name); toast('Удалено'); svc('reload'); CFG = await uciGetAll(); renderAdvanced();
+		});
+		r.appendChild(tglEl(s.enabled !== '0', (on) => uciSet(name, { enabled: on ? '1' : '0' })));
+		r.appendChild(del);
+		dl.appendChild(r);
+	});
+}
+
+/* ---------- events ---------- */
+$('loginBtn').addEventListener('click', async () => {
+	$('authErr').textContent = '';
+	try { await routerLogin($('pw').value); await refresh(); }
+	catch (e) { $('authErr').textContent = 'Неверный пароль.'; }
+});
+$('pw').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
+
+$('logoutRouterBtn').addEventListener('click', () => {
+	sessionStorage.removeItem('sid'); location.reload();
+});
+
+$('otpBtn').addEventListener('click', async () => {
+	const code = $('otp').value.trim();
+	if (!code) return toast('Сначала введите код из бота.');
+	$('otpBtn').disabled = true;
+	try {
+		const r = await call('account_login', { code: code });
+		if (r && r.ok) { toast('Готово! VPN настроен.'); setTimeout(refresh, 1500); }
+		else toast('Не удалось войти: ' + ((r && (r.detail || r.error)) || '?'));
+	} catch (e) { toast('Ошибка: ' + e.message); }
+	$('otpBtn').disabled = false;
+});
+
+$('powerBtn').addEventListener('click', async () => {
+	$('powerBtn').disabled = true;
+	try {
+		await uciSet('main', { enabled: RUNNING ? '0' : '1' });
+		await svc(RUNNING ? 'stop' : 'start');
+		toast(RUNNING ? 'Выключаю…' : 'Включаю…');
+		setTimeout(refresh, 2500);
+	} catch (e) { toast('Ошибка: ' + e.message); $('powerBtn').disabled = false; }
+});
+
+$('nodeSel').addEventListener('change', async (e) => {
+	try {
+		await call('api', { method: 'PUT', path: '/proxies/' + GROUP_NAME, query: '', body: JSON.stringify({ name: e.target.value }) });
+		toast('Сервер изменён: ' + e.target.value);
+	} catch (err) { toast('Ошибка: ' + err.message); }
+});
+
+$('syncLink').addEventListener('click', async (e) => {
+	e.preventDefault();
+	const r = await call('account_sync').catch(() => null);
+	toast(r && r.ok ? 'Подписка обновлена.' : 'Не удалось обновить.');
+});
+$('acctLogoutLink').addEventListener('click', async (e) => {
+	e.preventDefault();
+	if (!confirm('Выйти из аккаунта? VPN перестанет работать, пока вы не войдёте снова.')) return;
+	await call('account_logout').catch(() => null);
+	refresh();
+});
+
+$('advCb').addEventListener('change', (e) => {
+	$('advView').classList.toggle('hidden', !e.target.checked);
+	localStorage.setItem('adv', e.target.checked ? '1' : '0');
+});
+
+$('subAdd').addEventListener('click', async () => {
+	const url = $('subUrl').value.trim();
+	if (!url) return;
+	if (/^https?:\/\//.test(url))
+		await uciAdd('subscription', { enabled: '1', url: url, user_agent: 'clash.meta' });
+	else {
+		/* share link — append to the proxy group's links list */
+		const links = [].concat(CFG[GROUP_NAME] && CFG[GROUP_NAME].links || [], url);
+		await uciSet(GROUP_NAME, { links: links });
+	}
+	$('subUrl').value = ''; toast('Добавлено'); svc('reload');
+	CFG = await uciGetAll(); renderAdvanced();
+});
+
+$('devAdd').addEventListener('click', async () => {
+	const id = $('devMac').value.trim(); if (!id) return;
+	const vals = { enabled: '1', mode: 'proxy', name: $('devName').value.trim() || 'device' };
+	if (/^[0-9a-f]{2}(:[0-9a-f]{2}){5}$/i.test(id)) vals.mac = id.toLowerCase(); else vals.ip = id;
+	await uciAdd('device', vals);
+	$('devMac').value = ''; $('devName').value = '';
+	toast('Добавлено'); svc('reload');
+	CFG = await uciGetAll(); renderAdvanced();
+});
+
+$('diagBtn').addEventListener('click', async () => {
+	const out = $('diagOut'); out.classList.remove('hidden'); out.textContent = 'Проверяю…';
+	let txt = '';
+	for (const c of ['config', 'dns', 'proxy', 'nft']) {
+		const r = await call('diag', { check: c }).catch(() => ({ output: 'ошибка' }));
+		txt += '--- ' + c + ' ---\n' + (r.output || '').slice(0, 2000) + '\n\n';
+	}
+	out.textContent = txt;
+});
+$('logsBtn').addEventListener('click', async () => {
+	const out = $('diagOut'); out.classList.remove('hidden');
+	const r = await call('logs', { lines: 100 }).catch(() => ({ log: '' }));
+	out.textContent = r.log || '(пусто)';
+});
+
+/* ---------- boot ---------- */
+(async function () {
+	if (await sessionAlive()) {
+		try {
+			await refresh();
+			const di = await call('dashboard_info').catch(() => null);
+			if (di) $('dashLink').href =
+				`http://${location.hostname}:${di.port}/ui/?hostname=${location.hostname}&port=${di.port}&secret=${encodeURIComponent(di.secret)}`;
+			if (localStorage.getItem('adv') === '1') { $('advCb').checked = true; $('advView').classList.remove('hidden'); }
+			return;
+		} catch (e) { /* fall through to login */ }
+	}
+	$('authView').classList.remove('hidden');
+})();
+</script>
+</body>
+</html>

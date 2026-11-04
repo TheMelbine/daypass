@@ -11,6 +11,8 @@
 . /usr/lib/__PKG_NAME__/dnsmasq.sh
 # shellcheck source=/dev/null
 . /usr/lib/__PKG_NAME__/list-update.sh
+# shellcheck source=/dev/null
+. /usr/lib/__PKG_NAME__/account.sh
 
 # --- mihomo binary resolution ---
 cmd_mihomo_path() {
@@ -107,8 +109,13 @@ case "$1" in
 	status)        cmd_status ;;
 	safe_paths)    safe_paths ;;
 	selftest)      cmd_selftest ;;
+	account_link)   cmd_account_link ;;
+	account_login)  cmd_account_login "$2" ;;
+	account_sync)   cmd_account_sync ;;
+	account_status) cmd_account_status ;;
+	account_logout) cmd_account_logout ;;
 	*)
-		echo "usage: ${PKG_NAME} {generate|check|mihomo_path|safe_paths|fw_start|fw_stop|dns_takeover|dns_restore|list_update|lists|status|selftest}" >&2
+		echo "usage: ${PKG_NAME} {generate|check|mihomo_path|safe_paths|fw_start|fw_stop|dns_takeover|dns_restore|list_update|lists|status|selftest|account_link|account_login|account_sync|account_status|account_logout}" >&2
 		exit 1
 		;;
 esac

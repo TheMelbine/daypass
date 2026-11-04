@@ -9,12 +9,23 @@
 			"uci": { "__PKG_NAME__": true }
 		}
 	},
+	"admin/services/__PKG_NAME__/home": {
+		"title": "Home",
+		"order": 1,
+		"action": {
+			"type": "view",
+			"path": "__PKG_NAME__/home"
+		}
+	},
 	"admin/services/__PKG_NAME__/connection": {
 		"title": "Connection",
 		"order": 10,
 		"action": {
 			"type": "view",
 			"path": "__PKG_NAME__/connection"
+		},
+		"depends": {
+			"uci": { "__PKG_NAME__": { "main": { "advanced_ui": "1" } } }
 		}
 	},
 	"admin/services/__PKG_NAME__/devices": {
@@ -23,6 +34,9 @@
 		"action": {
 			"type": "view",
 			"path": "__PKG_NAME__/devices"
+		},
+		"depends": {
+			"uci": { "__PKG_NAME__": { "main": { "advanced_ui": "1" } } }
 		}
 	},
 	"admin/services/__PKG_NAME__/rules": {
@@ -31,6 +45,9 @@
 		"action": {
 			"type": "view",
 			"path": "__PKG_NAME__/rules"
+		},
+		"depends": {
+			"uci": { "__PKG_NAME__": { "main": { "advanced_ui": "1" } } }
 		}
 	},
 	"admin/services/__PKG_NAME__/settings": {
@@ -39,6 +56,9 @@
 		"action": {
 			"type": "view",
 			"path": "__PKG_NAME__/settings"
+		},
+		"depends": {
+			"uci": { "__PKG_NAME__": { "main": { "advanced_ui": "1" } } }
 		}
 	},
 	"admin/services/__PKG_NAME__/diagnostics": {
@@ -47,6 +67,9 @@
 		"action": {
 			"type": "view",
 			"path": "__PKG_NAME__/diagnostics"
+		},
+		"depends": {
+			"uci": { "__PKG_NAME__": { "main": { "advanced_ui": "1" } } }
 		}
 	},
 	"admin/services/__PKG_NAME__/dashboard": {
@@ -55,6 +78,9 @@
 		"action": {
 			"type": "view",
 			"path": "__PKG_NAME__/dashboard"
+		},
+		"depends": {
+			"uci": { "__PKG_NAME__": { "main": { "advanced_ui": "1" } } }
 		}
 	}
 }

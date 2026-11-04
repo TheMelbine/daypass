@@ -56,6 +56,31 @@ const callLogs = rpc.declare({
 	expect: { log: '' }
 });
 
+const callAccountStatus = rpc.declare({
+	object: 'luci.__PKG_NAME__',
+	method: 'account_status',
+	expect: { }
+});
+
+const callAccountLogin = rpc.declare({
+	object: 'luci.__PKG_NAME__',
+	method: 'account_login',
+	params: ['code'],
+	expect: { }
+});
+
+const callAccountSync = rpc.declare({
+	object: 'luci.__PKG_NAME__',
+	method: 'account_sync',
+	expect: { }
+});
+
+const callAccountLogout = rpc.declare({
+	object: 'luci.__PKG_NAME__',
+	method: 'account_logout',
+	expect: { }
+});
+
 const callApi = rpc.declare({
 	object: 'luci.__PKG_NAME__',
 	method: 'api',
@@ -122,5 +147,21 @@ return baseclass.extend({
 
 	dashboardInfo: function () {
 		return callDashboardInfo();
+	},
+
+	accountStatus: function () {
+		return callAccountStatus();
+	},
+
+	accountLogin: function (code) {
+		return callAccountLogin(code);
+	},
+
+	accountSync: function () {
+		return callAccountSync();
+	},
+
+	accountLogout: function () {
+		return callAccountLogout();
 	}
 });
